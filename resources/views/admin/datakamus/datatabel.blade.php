@@ -28,10 +28,14 @@
 </script>
 
 {{-- TABLE --}}
+
 <div class="table-responsive">
     <table class="table table-hover align-middle text-nowrap">
         <thead class="align-middle">
             <tr>
+                <th style="width: 4%;">
+                    <input type="checkbox" id="selectAllCheckbox">
+                </th>
                 <th class="text-center" style="width: 10%;">KATA</th>
                 <th class="text-center" style="width: 12%;">SUKU KATA</th>
                 <th class="text-center" style="width: 10%;">KELAS KATA</th>
@@ -45,20 +49,19 @@
             @if(isset($dataKamus) && $dataKamus->count() > 0)
             @foreach ($dataKamus as $item)
             <tr>
+                <td class="text-center">
+                    <input type="checkbox" class="rowCheckbox" value="{{ $item->id }}">
+                </td>
                 <td class="fw-semibold text-capitalize text-center">{{ $item->kata }}</td>
                 <td class="text-center">{{ $item->suku_kata ?? '-' }}</td>
                 <td class="text-center">{{ $item->kelas_kata }}</td>
-
                 <td class="text-truncate-td" data-bs-toggle="tooltip" title="{{ $item->arti }}">
                     {{ $item->arti }}
                 </td>
-
                 <td class="text-center">{{ $item->asal_kamus }}</td>
-
                 <td class="text-center">
                     {{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->format('d-m-Y') : '-' }}
                 </td>
-
                 <td class="text-center">
                     <div class="d-flex justify-content-center gap-2">
                         {{-- DETAIL --}}
@@ -195,12 +198,6 @@
                 <!-- FOOTER -->
                 <div class="modal-footer border-0 pb-4 px-4">
 
-                    <button type="button" class="btn btn-light border shadow-sm rounded-3 px-3"
-                        data-bs-dismiss="modal">
-                        <i class="bx bx-x me-1"></i>
-                        Tutup
-                    </button>
-
                     <button type="submit"
                         class="btn text-white rounded-3 px-4"
                         style="background:#2e7d32;">
@@ -220,17 +217,15 @@
 @endforeach
 
 {{-- Enable tooltip + handle delete confirmation --}}
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // init bootstrap tooltips (if bootstrap is loaded)
-        try {
-            const tt = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tt.forEach(el => new bootstrap.Tooltip(el));
-        } catch (e) {
-            console.warn('Bootstrap tooltip init failed:', e);
-        }
+        // Tooltip
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            new bootstrap.Tooltip(el);
+        });
 
-        // delete confirmation (SweetAlert)
+        // Delete single
         document.querySelectorAll('.delete-form').forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -249,12 +244,71 @@
             });
         });
 
-        // debug helper: jika ada tombol yang target modal tapi modal tidak ditemukan -> log
-        document.querySelectorAll('[data-bs-toggle="modal"]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const target = this.getAttribute('data-bs-target');
-                if (!document.querySelector(target)) {
-                    console.error('Modal target not found in DOM:', target, ' — ensure included and ID matches.');
+        // Checkbox select all
+        const selectAll = document.getElementById('selectAllCheckbox');
+        const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function() {
+                rowCheckboxes.forEach(cb => cb.checked = selectAll.checked);
+            });
+        }
+
+        rowCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (selectAll) selectAll.checked = [...rowCheckboxes].every(c => c.checked);
+            });
+        });
+
+        // Hapus banyak
+        document.getElementById('btnDeleteSelected').addEventListener('click', function() {
+            const selectedIds = [...rowCheckboxes].filter(cb => cb.checked).map(cb => cb.value);
+            if (selectedIds.length === 0) {
+                Swal.fire('Oops!', 'Pilih minimal 1 data untuk dihapus.', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Hapus data terpilih?',
+                text: `Anda akan menghapus ${selectedIds.length} data kosakata.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    fetch("{{ route('admin.kamus.bulkDestroy') }}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                ids: selectedIds
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: data.message ?? 'Data berhasil dihapus.',
+                                icon: 'success',
+                                timer: 1200,
+                                showConfirmButton: false
+                            });
+
+                            // Hapus baris table
+                            selectedIds.forEach(id => {
+                                const row = document.querySelector(`.rowCheckbox[value="${id}"]`)?.closest('tr');
+                                if (row) row.remove();
+                            });
+                        })
+                        .catch(err => {
+                            Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus data.', 'error');
+                        });
                 }
             });
         });

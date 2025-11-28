@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Favicon --}}
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.png') }}" />
@@ -13,10 +14,16 @@
     @vite(['resources/css/app.css'])
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
+        /* body {
             font-family: 'Poppins', sans-serif;
+        } */
+
+        body {
+            font-family: "JetBrains Mono", monospace;
         }
+
 
         .menu-item {
             position: relative;
@@ -39,8 +46,9 @@
         }
 
         #searchDropdown {
-            max-height: 15rem;
-            overflow-y: auto;
+            width: 100%;
+            max-width: 100%;
+            border-radius: 12px;
         }
 
         #resultsList li {
@@ -133,6 +141,10 @@
             opacity: 0.7;
             /* agak redup */
         }
+
+        .font-jetbrains {
+            font-family: "JetBrains Mono", monospace !important;
+        }
     </style>
     <!-- AOS Animation -->
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
@@ -146,8 +158,9 @@
     @include('partials.navbar')
 
     <section id="beranda"
-        class="relative min-h-screen flex flex-col items-center justify-start text-white overflow-hidden bg-cover bg-center"
-        style="background-image: url('{{ asset('assets/background4.png') }}'); padding-top: 100px;"
+        class="relative min-h-screen flex flex-col items-center justify-start text-white overflow-hidden bg-cover bg-center
+        pt-28 sm:pt-32 md:pt-40 pb-10 px-4 sm:px-6"
+        style="background-image: url('{{ asset('assets/background4.png') }}');"
         data-aos="fade-in"
         data-aos-duration="1500">
 
@@ -172,45 +185,57 @@
                 data-aos-delay="200">BALAI BAHASA PROVINSI RIAU</p>
 
             <h1 id="title"
-                class="text-3xl md:text-5xl font-extrabold leading-tight mb-5 bg-gradient-to-r from-white-500 bg-clip-text font-poppins text-gray-600"
+                class="text-3xl md:text-5xl font-extrabold leading-tight mb-5 bg-gradient-to-r from-white-500 bg-clip-text font-jetbrains text-gray-600"
                 data-aos="zoom-in" data-aos-delay="400">
                 Kamus Digital Bahasa <br> Daerah Riau
             </h1>
             <div id="searchContainer" class="w-full max-w-[1200px] mx-auto mt-[5px]" data-aos="fade-up" data-aos-delay="600">
-                <div id="searchBox" class="relative w-full transition-all duration-500 flex items-center gap-2">
+
+                <div id="searchBox"
+                    class="relative w-full transition-all duration-500 flex flex-col sm:flex-row items-stretch gap-2">
+
                     <!-- Input Search -->
-                    <div class="flex items-center bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 flex-grow">
-                        <div class="px-3 text-gray-500 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+                    <div class="flex items-center bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 flex-grow w-full">
+                        <div class="px-2 text-gray-500 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
                             </svg>
                         </div>
-                        <input id="searchInput" type="text" placeholder="Cari kata dalam bahasa daerah..." class="w-full py-3 px-2 outline-none text-gray-700 font-medium font-poppins" />
+                        <input id="searchInput" type="text"
+                            placeholder="Cari kata atau arti dalam bahasa Indonesia..."
+                            class="w-full py-1.5 px-2 outline-none text-gray-700 font-medium font-jetbrains text-sm sm:text-base" />
                     </div>
 
                     <!-- Filter Dropdown -->
-                    <div class="relative">
-                        <button id="filterButton" class="bg-white border border-gray-200 shadow-md rounded-lg px-5 py-3 text-gray-700 font-medium flex items-center gap-7">
+                    <div class="relative w-full sm:w-auto">
+                        <button id="filterButton"
+                            class="bg-white border border-gray-200 shadow-md rounded-lg px-4 py-1.5 w-full sm:w-auto text-gray-700 font-medium flex items-center justify-between gap-2">
                             <span id="filterText">Filter Kamus..</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
-                        <ul id="filterDropdown" class="absolute right-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg hidden z-50">
-                            <li class="px-4 py-2 hover:bg-blue-100 cursor-pointer rounded-lg text-gray-600" data-value="">
+
+                        <ul id="filterDropdown"
+                            class="absolute right-0 mt-1 w-full sm:w-44 bg-white border border-gray-200 rounded-lg shadow-lg hidden z-50">
+                            <li class="px-4 py-2 hover:bg-blue-100 cursor-pointer rounded-lg text-gray-600 text-sm" data-value="">
                                 Semua Kamus
                             </li>
 
                             @foreach($daftarAsalKamus as $kamus)
-                            <li class="px-4 py-2 hover:bg-blue-100 cursor-pointer text-gray-600"
+                            <li class="px-4 py-2 hover:bg-blue-100 cursor-pointer text-gray-600 text-sm"
                                 data-value="{{ $kamus }}">
                                 {{ str_replace('Kamus Indonesia - ', '', $kamus) }}
                             </li>
                             @endforeach
                         </ul>
-
                     </div>
                 </div>
+
+
 
                 <!-- Dropdown hasil pencarian -->
                 <div id="searchDropdown" class="mt-2 bg-white border border-gray-200 rounded-lg shadow-lg hidden transition-all duration-500 transform origin-top scale-y-0">
@@ -221,7 +246,8 @@
                 <div id="resultDetail" class="mt-4 hidden opacity-0 transform scale-95 transition-all duration-500 w-full max-w-[1200px] mx-auto"></div>
 
                 <!-- Card Informasi Kamus -->
-                <div id="cardContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2"
+                <div id="cardContainer"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 px-2 sm:px-0"
                     data-aos="fade-up" data-aos-delay="800">
                     <div class="bg-white shadow-md hover:shadow-lg p-4 rounded-md text-center cursor-pointer">
                         <h3 class="text-blue-600 font-bold text-sm md:text-base">7.000+ KosaKata</h3>
@@ -242,6 +268,95 @@
                 </div>
             </div>
 
+            <!-- Welcome Floating Card -->
+            <div id="welcomeCard"
+                class="welcome-card fixed bottom-5 right-5 w-64 bg-white shadow-lg rounded-xl p-4 flex items-center gap-3 border border-dark-100 z-50">
+                <!-- Maskot -->
+                <img src="{{ asset('assets/bb2.png') }}" alt="Maskot"
+                    class="w-14 h-14 object-contain drop-shadow-md">
+
+                <!-- Text -->
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-blue-700 leading-tight">
+                        Selamat datang di Kamus Digital Riau!
+                    </p>
+                </div>
+
+                <!-- Close Button -->
+                <button onclick="closeWelcomeCard()"
+                    class="text-gray-400 hover:text-red-500 transition text-sm font-bold ml-1">
+                    ✕
+                </button>
+            </div>
+
+            <style>
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(15px);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .animate-fadeIn {
+                    animation: fadeIn 0.5s ease-out;
+                }
+
+                @keyframes blueBlink {
+
+                    0%,
+                    100% {
+                        box-shadow: 0 0 0px rgba(37, 99, 235, 0);
+                        opacity: 0.9;
+                    }
+
+                    50% {
+                        box-shadow: 0 0 14px rgba(37, 99, 235, 0.7);
+                        opacity: 1;
+                    }
+                }
+
+                /* Card Default (Desktop) */
+                .welcome-card {
+                    animation: blueBlink 1.1s infinite ease-in-out;
+                    transition: opacity .3s;
+                }
+
+                /* Mobile Responsiveness */
+                @media (max-width: 640px) {
+                    .welcome-card {
+                        width: 75%;
+                        bottom: 1rem;
+                        right: 1rem;
+                        padding: .65rem .8rem;
+                        font-size: .85rem;
+                    }
+                }
+            </style>
+
+            <script>
+                function closeWelcomeCard() {
+                    const card = document.getElementById('welcomeCard');
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(10px)';
+                    setTimeout(() => card.remove(), 300);
+
+                    // simpan biar gak muncul lagi sampai reload
+                    sessionStorage.setItem('hideWelcomeCard', 'true');
+                }
+
+                window.addEventListener('load', () => {
+                    if (sessionStorage.getItem('hideWelcomeCard') === 'true') {
+                        const card = document.getElementById('welcomeCard');
+                        if (card) card.remove();
+                    }
+                });
+            </script>
+
             <script>
                 const searchInput = document.getElementById("searchInput");
                 const dropdown = document.getElementById("searchDropdown");
@@ -251,51 +366,56 @@
                 const filterButton = document.getElementById("filterButton");
                 const filterDropdown = document.getElementById("filterDropdown");
                 const filterText = document.getElementById("filterText");
-                let selectedFilter = ""; // default Semua Kamus
+                let selectedFilter = ""; // default = Semua Kamus
 
-                // filter dropdown toggle
+                // ✅ Toggle filter dropdown
                 filterButton.addEventListener("click", () => {
                     filterDropdown.classList.toggle("hidden");
                 });
 
                 filterDropdown.querySelectorAll("li").forEach(li => {
                     li.addEventListener("click", () => {
-                        selectedFilter = li.getAttribute("data-value");
+                        selectedFilter = li.getAttribute("data-value") ?? "";
                         filterText.textContent = li.textContent;
                         filterDropdown.classList.add("hidden");
-                        performSearch(); // search ulang sesuai filter
+                        performSearch(); // refresh results sesuai filter
                     });
                 });
 
+                // ✅ Truncate helper
                 function truncateText(text, max = 30) {
                     if (!text) return "";
                     return text.length > max ? text.slice(0, max) + "..." : text;
                 }
 
+                // ✅ Detail card builder
                 function createDetailCard(item) {
                     let artiHTML = Array.isArray(item.arti) ?
                         item.arti.map((a, i) => `<p>${i+1}. ${a}</p>`).join("") :
                         `<p>${item.arti}</p>`;
+
                     const card = document.createElement("div");
                     card.className = "bg-white shadow-md rounded-lg p-5 text-left max-w-full overflow-x-auto mt-3";
                     card.innerHTML = `
-                        <h2 class="text-xl font-bold text-blue-600">${item.kata}/${item.suku_kata}</h2>
-                        <p class="italic text-gray-500 mb-1">(${item.kelas_kata})</p>
-                        <p class="text-gray-500 mb-2"><strong>Sumber Kamus:</strong> ${item.asal_kamus}</p>
-                        <div class="text-gray-700 mb-2 max-h-48 overflow-y-auto"><strong>Arti:</strong>${artiHTML}</div>
-                        ${item.contoh?`<p class="text-sm text-gray-600 italic">Contoh: ${item.contoh}</p>`:""}
-                    `;
+            <h2 class="text-xl font-bold text-blue-600">${item.kata}/${item.suku_kata}</h2>
+            <p class="italic text-gray-500 mb-1">(${item.kelas_kata})</p>
+            <p class="text-gray-500 mb-2"><strong>Sumber Kamus:</strong> ${item.asal_kamus}</p>
+            <div class="text-gray-700 mb-2 max-h-48 overflow-y-auto"><strong>Arti:</strong>${artiHTML}</div>
+            ${item.contoh ? `<p class="text-sm text-gray-600 italic">Contoh: ${item.contoh}</p>` : ""}
+        `;
                     return card;
                 }
 
-                function debounce(func, delay) {
+                // ✅ Single debounce version (fix double)
+                function debounce(func, delay = 200) {
                     let timeout;
                     return (...args) => {
                         clearTimeout(timeout);
                         timeout = setTimeout(() => func(...args), delay);
-                    }
+                    };
                 }
 
+                // ✅ Single clean performSearch — version with highlight support
                 async function performSearch() {
                     const keyword = searchInput.value.trim();
                     resultsList.innerHTML = "";
@@ -306,66 +426,82 @@
                     }
 
                     try {
-                        const res = await fetch(`/search?q=${encodeURIComponent(keyword)}&asal_kamus=${encodeURIComponent(selectedFilter)}`);
-                        let data = await res.json();
+                        const res = await fetch(
+                            `/search?q=${encodeURIComponent(keyword)}&asal_kamus=${encodeURIComponent(selectedFilter)}`
+                        );
 
-                        // Kalau 1 Data Kamus aja pakai ini
-                        // const seen = new Set();
-                        // data = data.filter(item => {
-                        //     if (seen.has(item.kata.toLowerCase())) return false;
-                        //     seen.add(item.kata.toLowerCase());
-                        //     return true;
-                        // });
+                        if (!res.ok) throw new Error("Fetch error");
+                        const data = await res.json();
 
-                        const seen = new Set();
-                        data = data.filter(item => {
-                            const key = item.kata.toLowerCase() + "|" + item.asal_kamus;
-                            if (seen.has(key)) return false;
-                            seen.add(key);
-                            return true;
-                        });
-
-
-                        if (data.length === 0) {
+                        if (!Array.isArray(data) || data.length === 0) {
                             resultsList.innerHTML = `<li class="p-3 text-gray-500">Tidak ada hasil</li>`;
-                        } else {
-                            data.slice(0, 100).forEach(item => {
-                                const li = document.createElement("li");
-                                li.className = "p-3 hover:bg-gray-50 cursor-pointer text-left flex flex-col";
-                                li.style.lineHeight = "1.2";
-                                li.innerHTML = `
-                                    <span class="font-semibold text-blue-600">${item.kata}/${item.suku_kata}</span>
-                                    <span class="text-gray-500 text-sm">(${item.kelas_kata})</span>
-                                    <span class="text-gray-700 text-xs">Arti: ${truncateText(item.arti)}</span>
-                                    <span class="text-gray-700 text-xs">Contoh: ${truncateText(item.contoh)}</span>
-                                    <span class="text-gray-500 text-xs">Sumber: ${truncateText(item.asal_kamus, 40)}</span>
-                                `;
-                                li.addEventListener("click", () => {
-                                    const card = createDetailCard(item);
-                                    resultDetail.innerHTML = "";
-                                    resultDetail.appendChild(card);
-                                    resultDetail.classList.remove("hidden");
-                                    setTimeout(() => {
-                                        resultDetail.classList.add("opacity-100", "scale-100");
-                                    }, 50);
-                                    dropdown.classList.add("hidden");
-                                    dropdown.classList.remove("scale-y-100");
-                                });
-                                resultsList.appendChild(li);
-                            });
+                            dropdown.classList.remove("hidden");
+                            dropdown.classList.add("scale-y-100");
+                            return;
                         }
+
+                        resultsList.innerHTML = "";
+                        data.slice(0, 50).forEach(item => {
+                            const li = document.createElement("li");
+                            li.className = "p-3 hover:bg-gray-50 cursor-pointer text-left flex flex-col";
+                            li.style.lineHeight = "1.2";
+                            li.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="font-semibold text-blue-600">
+                                ${item.kata_highlight}${item.suku_kata ? '/' + item.suku_kata : ''}
+                            </span>
+                            <div class="text-gray-500 text-xs">
+                                (${item.kelas_kata}) • <span class="text-gray-400">${item.asal_kamus}</span>
+                            </div>
+                            <div class="text-gray-700 text-xs mt-1">Arti: ${item.arti_highlight}</div>
+                            ${item.contoh ? `<div class="text-gray-600 text-xs italic">Contoh: ${item.contoh_highlight}</div>` : ''}
+                        </div>
+                        <div class="text-xs text-gray-400 ml-3">Lihat</div>
+                    </div>
+                `;
+                            li.addEventListener("click", () => {
+                                const card = createDetailCard(item);
+                                resultDetail.innerHTML = "";
+                                resultDetail.appendChild(card);
+                                resultDetail.classList.remove("hidden");
+                                setTimeout(() => {
+                                    resultDetail.classList.add("opacity-100", "scale-100");
+                                }, 50);
+                                dropdown.classList.add("hidden");
+
+                                // track pencarian (fire-and-forget)
+                                fetch("/track-search", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    },
+                                    body: JSON.stringify({
+                                        id: item.id
+                                    })
+                                }).catch(err => {
+                                    // jangan ganggu UI kalau gagal
+                                    console.debug('track failed', err);
+                                });
+                            });
+                            resultsList.appendChild(li);
+                        });
 
                         dropdown.classList.remove("hidden");
                         dropdown.classList.add("scale-y-100");
-
                     } catch (error) {
                         console.error("Error fetching data:", error);
                         resultsList.innerHTML = `<li class="p-3 text-red-500">Terjadi kesalahan saat mencari</li>`;
+                        dropdown.classList.remove("hidden");
+                        dropdown.classList.add("scale-y-100");
                     }
                 }
 
-                searchInput.addEventListener("input", debounce(performSearch, 300));
+                // ✅ attach only ONE event listener
+                searchInput.addEventListener("input", debounce(performSearch, 200));
 
+                // ✅ Close dropdown when clicking outside
                 document.addEventListener("click", (e) => {
                     if (!e.target.closest("#searchBox") && !e.target.closest("#filterButton")) {
                         dropdown.classList.add("hidden");
@@ -374,11 +510,22 @@
                     }
                 });
             </script>
+
+            <!-- ✅ highlight CSS (keep once only) -->
+            <style>
+                #resultsList li mark {
+                    background: #ffe58a;
+                    color: #000;
+                    padding: 0 3px;
+                    border-radius: 2px;
+                }
+            </style>
+
             <script>
                 AOS.init({
-                    duration: 1000, // durasi animasi (ms)
-                    once: true, // animasi hanya muncul sekali
-                    offset: 100 // jarak sebelum animasi mulai
+                    duration: 1000,
+                    once: true,
+                    offset: 100
                 });
             </script>
 

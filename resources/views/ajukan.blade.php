@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pelayanan Ajukan KosaKata - Kamus Balai Bahasa Riau</title>
     @vite(['resources/css/app.css'])
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="//unpkg.com/alpinejs" defer></script>
 
     <style>
         section {
@@ -18,6 +19,10 @@
             align-items: center;
             padding-top: 100px;
             text-align: center;
+        }
+
+        .font-jetbrains {
+            font-family: 'JetBrains Mono', monospace !important;
         }
 
         .guide-card {
@@ -220,7 +225,7 @@
 
         {{-- Kartu panduan Ajukan kata --}}
         <div class="relative z-10 fade-up mt-12 px-4 max-w-5xl mx-auto text-center">
-            <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-6 flex items-center justify-center gap-3 animate-fade-in">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-6 flex items-center justify-center gap-3 animate-fade-in font-jetbrains">
                 <span class="text-indigo-600 animate-bounce-slow"></span>
                 Ajukan KosaKata
             </h1>
@@ -236,7 +241,7 @@
             class="guide-card relative z-10 bg-white/90 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl p-10 max-w-4xl w-11/12 text-center transition-all duration-300 hover:shadow-indigo-300/40">
 
             <h2 class="text-3xl font-bold text-indigo-700 mb-10 drop-shadow-sm tracking-wide">
-                ✨ Panduan Pengajuan Ajukan Kosakata
+                Panduan Pengajuan Ajukan Kosakata
             </h2>
 
             {{-- Step Grid --}}
@@ -246,7 +251,7 @@
                     class="p-5 rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white shadow-md hover:shadow-lg transition-all">
                     <div class="flex items-start gap-4">
                         <div
-                            class="flex items-center justify-center bg-indigo-500 text-white w-10 h-10 rounded-full text-lg shadow-md">
+                            class="flex items-center justify-center bg-indigo-500 text-white w-20 h-10 rounded-full text-lg shadow-md">
                             📘
                         </div>
                         <div>
@@ -261,7 +266,7 @@
                     class="p-5 rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white shadow-md hover:shadow-lg transition-all">
                     <div class="flex items-start gap-4">
                         <div
-                            class="flex items-center justify-center bg-indigo-500 text-white w-10 h-10 rounded-full text-lg shadow-md">
+                            class="flex items-center justify-center bg-indigo-500 text-white w-20 h-10 rounded-full text-lg shadow-md">
                             🔍
                         </div>
                         <div>
@@ -276,7 +281,7 @@
                     class="p-5 rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white shadow-md hover:shadow-lg transition-all">
                     <div class="flex items-start gap-4">
                         <div
-                            class="flex items-center justify-center bg-indigo-500 text-white w-10 h-10 rounded-full text-lg shadow-md">
+                            class="flex items-center justify-center bg-indigo-500 text-white w-20 h-10 rounded-full text-lg shadow-md">
                             🧩
                         </div>
                         <div>
@@ -291,7 +296,7 @@
                     class="p-5 rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white shadow-md hover:shadow-lg transition-all">
                     <div class="flex items-start gap-4">
                         <div
-                            class="flex items-center justify-center bg-indigo-500 text-white w-10 h-10 rounded-full text-lg shadow-md">
+                            class="flex items-center justify-center bg-indigo-500 text-white w-20 h-10 rounded-full text-lg shadow-md">
                             ✍️
                         </div>
                         <div>

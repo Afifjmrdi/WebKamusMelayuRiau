@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
     use Illuminate\Http\Request;
     use App\Models\Kamus;
+    use Illuminate\Support\Str;
     use App\Models\Kata;
     use App\Models\Visitor;
     use Carbon\Carbon;
@@ -36,49 +37,140 @@ class KamusController extends Controller
             return \App\Models\Kata::inRandomOrder()->limit(16)->get();
         });
 
+        $trending = Cache::remember('trending_kata_10', 300, function () {
+            return \App\Models\Kamus::orderBy('search_count', 'desc')->limit(10)->get();
+        });
+
         $daftarAsalKamus = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus')->toArray();
 
-        return view('home', compact('kosakataHariIni', 'daftarAsalKamus'));
+        return view('home', compact('kosakataHariIni', 'daftarAsalKamus', 'trending'));
     }
 
     public function search(Request $request)
-{
-    $q = $request->input('q');
-    $filterAsal = $request->input('asal_kamus'); // filter optional
+    {
+        $q = trim((string) $request->input('q', ''));
+        $filterAsal = $request->input('asal_kamus', '');
 
-    $query = Kamus::query();
-
-    if ($q) {
-        $query->where('kata', 'LIKE', "%{$q}%");
-    }
-
-        // hanya filter kalau ada isinya
-        if ($filterAsal && $filterAsal !== "") {
-            $query->where('asal_kamus', 'LIKE', "%{$filterAsal}%");
+        // jika kosong, return kosong (frontend tidak akan menampilkan)
+        if ($q === '') {
+            return response()->json([]);
         }
 
-        $results = $query->get();
-    return response()->json($results);
-}
+        // limit hasil agar tidak membebani
+        $limit = 100;
+
+        // cache key
+        $cacheKey = 'search:' . md5($q . '|' . $filterAsal);
+
+        $results = Cache::remember($cacheKey, 30, function () use ($q, $filterAsal, $limit) {
+            $query = Kamus::query()
+                ->select('id', 'kata', 'suku_kata', 'kelas_kata', 'arti', 'contoh', 'asal_kamus');
+
+            // prioritas: kata yang mulai dengan q dulu (fast), lalu kata mengandung q, lalu arti/contoh
+            $query->where(function ($sub) use ($q) {
+                $sub->where('kata', 'LIKE', $q . '%')
+                    ->orWhere('kata', 'LIKE', '%' . $q . '%')
+                    ->orWhere('arti', 'LIKE', '%' . $q . '%')
+                    ->orWhere('contoh', 'LIKE', '%' . $q . '%');
+            });
+
+            // optional filter sumber kamus
+            if (!empty($filterAsal)) {
+                $query->where('asal_kamus', $filterAsal);
+            }
+
+            // ordering: prefer exact/prefix matches first
+            $query->orderByRaw("
+            CASE
+                WHEN kata LIKE ? THEN 0
+                WHEN kata LIKE ? THEN 1
+                ELSE 2
+            END", [$q . '%', '%' . $q . '%'])
+                ->orderBy('kata');
+
+            return $query->limit($limit)->get();
+        });
+
+        // highlight hasil (safe-ish, kita return HTML snippets; frontend akan gunakan innerHTML)
+        $escaped = preg_quote($q, '/');
+
+        $results = $results->map(function ($item) use ($escaped) {
+            $kata = $item->kata ?? '';
+            $arti = is_string($item->arti) ? $item->arti : (string) $item->arti;
+            $contoh = $item->contoh ?? '';
+
+            // highlight (case-insensitive)
+            $kata_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e($kata));
+            $arti_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($arti, 150)));
+            $contoh_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($contoh, 120)));
+
+            return [
+                'id' => $item->id,
+                'kata' => $kata,
+                'kata_highlight' => $kata_highlight,
+                'suku_kata' => $item->suku_kata,
+                'kelas_kata' => $item->kelas_kata,
+                'arti' => $arti,
+                'arti_highlight' => $arti_highlight,
+                'contoh' => $contoh,
+                'contoh_highlight' => $contoh_highlight,
+                'asal_kamus' => $item->asal_kamus,
+            ];
+        });
+
+        return response()->json($results);
+    }
+
+    public function trackSearch(Request $request)
+    {
+        $id = (int) $request->input('id', 0);
+        if ($id <= 0) {
+            return response()->json(['success' => false, 'message' => 'Invalid id'], 400);
+        }
+
+        try {
+            // race-safe increment
+            Kamus::where('id', $id)->increment('search_count');
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            Log::error('trackSearch error: ' . $e->getMessage());
+            return response()->json(['success' => false], 500);
+        }
+    }
+
+    /** (optional) return JSON detail untuk id tertentu */
+    public function detailJson($id)
+    {
+        $item = Kamus::select('id', 'kata', 'suku_kata', 'kelas_kata', 'arti', 'contoh', 'asal_kamus')->find($id);
+
+        if (!$item) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
+
+        return response()->json($item);
+    }
 
     public function adminDashboard()
     {
-        // Pastikan hanya admin yang login bisa akses
         if (!session('admin_id')) {
             return redirect()->route('admin.login');
         }
 
-        // Ambil data jumlah kamus berdasarkan asal_kamus
-        $kuansingCount = Kamus::where('asal_kamus', 'Kamus Indonesia - Kuantan Singingi')->count();
-        $siakCount = Kamus::where('asal_kamus', 'Kamus Indonesia - Melayu Siak')->count();
-        $rohilCount = Kamus::where('asal_kamus', 'Kamus Indonesia - Rokan Hilir')->count();
-        $inhilCount = Kamus::where('asal_kamus', 'Kamus Indonesia - Indragiri Hulu')->count();
+        // // Hitung berdasarkan nama kamus (kalau masih diperlukan)
+        // $kuansingCount = Kamus::where('asal_kamus', 'Kamus Indonesia - Kuantan Singingi')->count();
+        // $siakCount     = Kamus::where('asal_kamus', 'Kamus Indonesia - Melayu Siak')->count();
+        // $rohilCount    = Kamus::where('asal_kamus', 'Kamus Indonesia - Rokan Hilir')->count();
+        // $inhilCount    = Kamus::where('asal_kamus', 'Kamus Indonesia - Indragiri Hulu')->count();
+
+        // ✅ daftar kamus dinamis dari database
+        $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
 
         return view('admin.dashboard', compact(
             'kuansingCount',
             'siakCount',
             'rohilCount',
-            'inhilCount'
+            'inhilCount',
+            'asalKamusList'
         ));
     }
 
@@ -126,16 +218,14 @@ class KamusController extends Controller
 
     public function adminKamus(Request $request)
     {
-        // pastikan admin login jika perlu
         if (!session('admin_id')) {
             return redirect()->route('admin.login');
         }
 
         $search = $request->input('search');
         $asal = $request->input('asal_kamus');
-        $kelas = $request->input('kelas_kata'); // 🆕 ambil filter kelas_kata
+        $kelas = $request->input('kelas_kata');
 
-        // sanitasi per_page
         $allowed = [10, 25, 50, 100];
         $perPage = (int) $request->input('per_page', 10);
         if (!in_array($perPage, $allowed)) {
@@ -144,7 +234,6 @@ class KamusController extends Controller
 
         $query = Kamus::query();
 
-        // 🔍 Filter pencarian kata / arti
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('kata', 'like', "%{$search}%")
@@ -152,25 +241,30 @@ class KamusController extends Controller
             });
         }
 
-        // 📖 Filter asal kamus
         if ($asal) {
             $query->where('asal_kamus', $asal);
         }
 
-        // 🆕 Filter kelas kata
         if ($kelas) {
             $query->where('kelas_kata', $kelas);
         }
 
         $dataKamus = $query->orderBy('created_at', 'desc')
             ->paginate($perPage)
-            ->withQueryString(); // penting agar query params ikut di pagination
+            ->withQueryString();
 
-        // list unik asal_kamus & kelas_kata untuk dropdown
+        $daftarAsalKamus = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
+        $kelasKataList   = Kamus::select('kelas_kata')->distinct()->pluck('kelas_kata');
+
+        // ✅ tambahan ini
         $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
-        $kelasKataList = Kamus::select('kelas_kata')->distinct()->pluck('kelas_kata'); // 🆕
 
-        return view('admin.kamus', compact('dataKamus', 'asalKamusList', 'kelasKataList'));
+        return view('admin.kamus', compact(
+            'dataKamus',
+            'daftarAsalKamus',
+            'kelasKataList',
+            'asalKamusList'
+        ));
     }
 
     public function create()
@@ -216,6 +310,33 @@ class KamusController extends Controller
             return back()->with('success', 'Data kosakata berhasil diimport!');
         } catch (\Exception $e) {
             return back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        if (!session('admin_id')) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $ids = $request->input('ids', []);
+
+        if (empty($ids) || !is_array($ids)) {
+            return response()->json(['message' => 'Tidak ada data yang dipilih.'], 400);
+        }
+
+        try {
+            Kamus::whereIn('id', $ids)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => count($ids) . ' data kosakata berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

@@ -57,6 +57,9 @@ Route::get('/tentang', function () {
 #  HALAMAN UMUM
 # =========================
 Route::get('/', [KamusController::class, 'index'])->name('home');
+// (opsional) ambil detail kamus by id (dipakai openKata untuk tampilkan detail)
+Route::post('/track-search', [KamusController::class, 'trackSearch'])->name('track.search');
+Route::get('/kamus/{id}', [KamusController::class, 'detailJson'])->name('kamus.detail.json');
 Route::get('/search', [KamusController::class, 'search'])->name('search');
 Route::get('/tentang', fn() => view('tentang'))->name('tentang');
 
@@ -147,6 +150,7 @@ Route::middleware([AdminAuth::class])->prefix('admin')->group(function () {
     Route::get('/chart-data/{year}', [AjukanKosakataController::class, 'getChartByYear'])->name('admin.chart-data');
 
     # Kamus (CRUD)
+    Route::post('/admin/kamus/bulk-destroy', [KamusController::class, 'bulkDestroy'])->name('admin.kamus.bulkDestroy');
     Route::get('/kamus', [KamusController::class, 'adminKamus'])->name('admin.kamus');
     Route::get('/kamus/create', [KamusController::class, 'create'])->name('admin.create');
     Route::post('/admin/kamus/store', [KamusController::class, 'store'])->name('admin.kamus.store');

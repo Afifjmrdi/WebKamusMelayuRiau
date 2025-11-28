@@ -215,14 +215,18 @@
 
                                     <!-- Asal Kamus -->
                                     <div class="md:col-span-2">
-                                        <label class="block font-semibold mb-2 text-gray-700">Asal Kamus <span class="text-red-500">*</span></label>
+                                        <label class="block font-semibold mb-2 text-gray-700">
+                                            Asal Kamus <span class="text-red-500">*</span>
+                                        </label>
+
                                         <select id="asal_kamus" name="asal_kamus"
                                             class="w-full p-3 rounded-xl border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+
                                             <option value="">Pilih kamus tujuan</option>
-                                            <option value="Kamus Indonesia - Kuantan Singingi">Kamus Indonesia - Kuantan Singingi</option>
-                                            <option value="Kamus Indonesia - Indragiri Hulu">Kamus Indonesia - Indragiri Hulu</option>
-                                            <option value="Kamus Indonesia - Melayu Siak">Kamus Indonesia - Melayu Siak</option>
-                                            <option value="Kamus Indonesia - Rokan Hilir">Kamus Indonesia - Rokan Hilir</option>
+
+                                            @foreach(($asalKamusList ?? $daftarAsalKamus) as $asal)
+                                            <option value="{{ $asal }}">{{ $asal }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 

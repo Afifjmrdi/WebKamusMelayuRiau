@@ -6,7 +6,7 @@
                 document.write(new Date().getFullYear());
             </script>
             Hak Cipta
-            <a href="#" target="_blank" class="footer-link fw-bolder">BALAI BAHASA PROVINSI RIAU</a>
+            <a href="#" target="_blank" class="footer-link fw-bold">BALAI BAHASA PROVINSI RIAU</a>
             <a style="margin-left: 30px; " href=" https://www.flaticon.com/free-icons/picture" title="picture icons">Picture icons created by kliwir art - Flaticon</a>
         </div>
     </div>

@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tentang Kami - Kamus Balai Bahasa Riau</title>
     @vite(['resources/css/app.css'])
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="//unpkg.com/alpinejs" defer></script>
 
     <style>
         body {
@@ -15,6 +16,10 @@
             background-color: #ffffff;
             color: #2d2d2d;
             overflow-x: hidden;
+        }
+
+        .font-jetbrains {
+            font-family: 'JetBrains Mono', monospace !important;
         }
 
         .kampus-logo {
@@ -184,7 +189,7 @@
 
         {{-- Konten Utama --}}
         <div class="relative z-10 fade-up mt-12 px-4 max-w-5xl mx-auto">
-            <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-6">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-6 font-jetbrains">
                 Tentang Kami
             </h1>
             <p class="text-gray-600 text-lg max-w-3xl mx-auto mb-12">

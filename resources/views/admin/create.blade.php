@@ -23,16 +23,12 @@
                     class="form-control"
                     placeholder="Cari kata atau arti...">
             </div>
-
-            <button class="btn btn-primary" type="submit" id="btnSearch">
-                <i class="bx bx-search"></i>
-            </button>
-
+            
             <!-- Filter Asal Kamus -->
             <select id="asalKamusSelect" name="asal_kamus" class="form-select" style="max-width: 220px;">
                 <option value="">Semua Kamus...</option>
 
-                @foreach($asalKamusList as $asal)
+                @foreach(($asalKamusList ?? $daftarAsalKamus) as $asal)
                 <option value="{{ $asal }}"
                     {{ request('asal_kamus') == $asal ? 'selected' : '' }}>
                     {{ $asal }}
@@ -55,6 +51,10 @@
             <a href="{{ route('admin.kamus') }}" class="btn btn-secondary">
                 <i class="bx bx-reset"></i> Reset
             </a>
+            <!-- Hapus Terpilih -->
+            <button type="button" id="btnDeleteSelected" class="btn btn-danger">
+                <i class="bx bx-trash me-1"></i> Hapus Terpilih
+            </button>
 
             <!-- Bagian Kanan -->
             <div class="d-flex align-items-center gap-2 flex-shrink-0">

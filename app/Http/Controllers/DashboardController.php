@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Kamus;
 use App\Models\Admin;
+use App\Models\KoreksiKata;
+use App\Models\PengajuanKosakata;
 use Carbon\Carbon;
 use App\Models\Visitor;
 use Illuminate\Support\Facades\DB;
@@ -16,8 +18,10 @@ class DashboardController extends Controller
         // Ambil admin yang login
         $admin = Admin::find($request->session()->get('admin_id'));
 
-        // Total seluruh kosakata
+        // Total seluruh kosakata/pengajuan/koreksi
         $totalKosakata = Kamus::count();
+        $totalPengajuan = PengajuanKosakata::count();
+        $totalKoreksi = KoreksiKata::count();
 
         // Total buku kamus unik
         $totalBuku = Kamus::select('asal_kamus')->distinct()->count();
@@ -38,6 +42,7 @@ class DashboardController extends Controller
 
         // Data chart bulanan (jumlah kosakata masuk per bulan)
         $monthlyData = $this->getMonthlyDataAll();
+        $barChartData = $this->getMonthlyDataPerKamus();
 
         // ======= Hitung visitor =======
         $ip = request()->ip();
@@ -61,6 +66,8 @@ class DashboardController extends Controller
         // ======= RETURN VIEW =======
         return view('admin.dashboard', compact(
             'admin',
+            'totalKoreksi',
+            'totalPengajuan',
             'totalKosakata',
             'totalBuku',
             'kamusCounts',
@@ -68,10 +75,10 @@ class DashboardController extends Controller
             'chartCounts',
             'recentKata',
             'monthlyData',
-            'totalVisitors' // pastikan ini dikirim ke view
+            'totalVisitors',
+            'barChartData'
         ));
     }
-
 
 /**
  * Mengambil data kosakata yang masuk per bulan untuk semua kamus
@@ -92,6 +99,27 @@ class DashboardController extends Controller
 
         return array_values($final);
     }
+
+    private function getMonthlyDataPerKamus()
+    {
+        $data = Kamus::selectRaw('asal_kamus, MONTH(created_at) as bulan, COUNT(*) as total')
+            ->groupBy('asal_kamus', 'bulan')
+            ->orderBy('asal_kamus')
+            ->get();
+
+        $result = [];
+
+        foreach ($data as $row) {
+            if (!isset($result[$row->asal_kamus])) {
+                // isi default 12 bulan semua 0
+                $result[$row->asal_kamus] = array_fill(1, 12, 0);
+            }
+            $result[$row->asal_kamus][$row->bulan] = $row->total;
+        }
+
+        return $result;
+    }
+
 
     // ===============================
     // HALAMAN KAMUS (untuk fitur admin)

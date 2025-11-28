@@ -1,6 +1,13 @@
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
     body {
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Poppins', sans-serif, 'jetbrains';
+    }
+
+    nav * {
+        font-family: "JetBrains Mono", monospace !important;
+        letter-spacing: 0.5px;
     }
 
     .menu-item {
@@ -121,95 +128,104 @@
 </style>
 
 {{-- Navbar --}}
-<nav x-data="{ open: false }"
-    class="px-6 md:px-20 py-4 absolute top-0 left-0 w-full z-50">
+<nav x-data="{ open: false }" class="px-6 md:px-20 py-4 absolute top-0 left-0 w-full z-50">
 
     <div class="flex items-center justify-between h-16">
-        {{-- Kiri: Logo + Menu --}}
+
+        {{-- Left: Logo + Desktop Menu --}}
         <div class="flex items-center gap-10">
             <img src="{{ asset('assets/BBP.png') }}" alt="Logo"
-                style="margin-top: 10px; height: 100px; width: auto; object-fit: contain;">
+                class="mt-2 h-20 w-auto object-contain">
+
             <ul class="hidden md:flex gap-10 text-gray font-semibold">
-                <li>
-                    <a href="{{ url('/') }}"
-                        class="menu-item pb-1 {{ request()->is('/') ? 'border-b-2' : '' }}"
-                        style="{{ request()->is('/') ? 'border-color:#000000ff;' : '' }}">
-                        Beranda
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/koreksi') }}"
-                        class="menu-item pb-1 {{ request()->is('koreksi') ? 'border-b-2' : '' }}"
-                        style="{{ request()->is('koreksi') ? 'border-color:#000000ff;' : '' }}">
-                        Koreksi Kosakata
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/ajukan') }}"
-                        class="menu-item pb-1 {{ request()->is('ajukan') ? 'border-b-2' : '' }}"
-                        style="{{ request()->is('ajukan') ? 'border-color:#000000ff;' : '' }}">
-                        Ajukan Kosakata
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/tentang') }}"
-                        class="menu-item pb-1 {{ request()->is('tentang') ? 'border-b-2' : '' }}"
-                        style="{{ request()->is('tentang') ? 'border-color:#000000ff;' : '' }}">
-                        Tentang Kami
-                    </a>
-                </li>
+                <li><a href="{{ url('/') }}"
+                        class="menu-item pb-1 {{ request()->is('/') ? 'active' : '' }}">BERANDA</a></li>
+
+                <li><a href="{{ url('/koreksi') }}"
+                        class="menu-item pb-1 {{ request()->is('koreksi') ? 'active' : '' }}">KOREKSI KOSAKATA</a></li>
+
+                <li><a href="{{ url('/ajukan') }}"
+                        class="menu-item pb-1 {{ request()->is('ajukan') ? 'active' : '' }}">AJUKAN KOSAKATA</a></li>
+
+                <li><a href="{{ url('/tentang') }}"
+                        class="menu-item pb-1 {{ request()->is('tentang') ? 'active' : '' }}">TENTANG KAMI</a></li>
+                <li><a href="{{ url('/tentang') }}"
+                        class="menu-item pb-1 {{ request()->is('tentang') ? 'active' : '' }}">BOOKMARK</a></li>
             </ul>
         </div>
 
-        {{-- Hamburger --}}
+        {{-- Hamburger Button --}}
         <button @click="open = !open"
-            class="md:hidden flex flex-col gap-1.5 focus:outline-none">
-            <span :class="open ? 'rotate-45 translate-y-1' : ''"
-                class="w-6 h-0.5 bg-black transition-all"></span>
-            <span :class="open ? 'opacity-0' : ''"
-                class="w-6 h-0.5 bg-black transition-all"></span>
-            <span :class="open ? '-rotate-45 -translate-y-1' : ''"
-                class="w-6 h-0.5 bg-black transition-all"></span>
+            class="md:hidden relative w-10 h-10 rounded-full bg-white shadow-sm border border-gray-300 
+           flex items-center justify-center transition-all duration-300"
+            :class="open ? 'ring-2 ring-blue-400 rotate-180' : ''">
+
+            <span class="absolute w-6 h-0.5 bg-black transition-all duration-300"
+                :class="open ? 'rotate-45 translate-y-0' : '-translate-y-2'"></span>
+
+            <span class="absolute w-6 h-0.5 bg-black transition-all duration-300"
+                :class="open ? 'opacity-0' : 'opacity-100'"></span>
+
+            <span class="absolute w-6 h-0.5 bg-black transition-all duration-300"
+                :class="open ? '-rotate-45 translate-y-0' : 'translate-y-2'"></span>
         </button>
+
+
     </div>
 
     {{-- Dropdown Mobile --}}
     <div x-show="open"
-        x-transition:enter="transition ease-out duration-500"
-        x-transition:enter-start="opacity-0 -translate-y-4"
-        x-transition:enter-end="opacity-100 translate-y-0"
-        x-transition:leave="transition ease-in duration-400"
-        x-transition:leave-start="opacity-100 translate-y-0"
-        x-transition:leave-end="opacity-0 -translate-y-4"
-        class="md:hidden backdrop-blur-xl bg-white/10 border border-white/20 rounded-b-3xl mx-4 mt-3 p-6 shadow-2xl text-white text-center space-y-5">
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 -translate-y-4 scale-95"
+        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+        x-transition:leave-end="opacity-0 -translate-y-4 scale-95"
+        class="md:hidden mx-4 mt-4 p-5 rounded-2xl shadow-xl border border-white/10
+           backdrop-blur-2xl bg-white/25 space-y-2 text-center">
 
+        {{-- Beranda --}}
         <a href="{{ url('/') }}"
-            class="block font-poppins font-semibold text-lg text-black tracking-wide hover:text-blue-400 relative 
-        after:absolute after:left-1/2 after:bottom-0 after:w-0 after:h-[2px] after:bg-blue-400 
-        after:transition-all after:duration-300 hover:after:w-1/2 hover:after:-translate-x-1/2">
-            Beranda
+            class="flex items-center justify-center gap-2 font-semibold text-base py-2.5 rounded-xl 
+            transition-all
+            {{ request()->is('/') ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/60' }}">
+            <i class="fa-solid fa-house
+              {{ request()->is('/') ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600' }}">
+            </i>
+            <span>{{ request()->is('/') ? '• Beranda •' : 'Beranda' }}</span>
         </a>
 
+        {{-- Koreksi --}}
         <a href="{{ url('/koreksi') }}"
-            class="block font-poppins font-semibold text-lg text-black tracking-wide hover:text-blue-400 relative 
-        after:absolute after:left-1/2 after:bottom-0 after:w-0 after:h-[2px] after:bg-blue-400 
-        after:transition-all after:duration-300 hover:after:w-1/2 hover:after:-translate-x-1/2">
-            Koreksi Kata
+            class="flex items-center justify-center gap-2 font-semibold text-base py-2.5 rounded-xl 
+            transition-all
+            {{ request()->is('koreksi') ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/60' }}">
+            <i class="fa-solid fa-pen-to-square
+              {{ request()->is('koreksi') ? 'text-blue-600' : 'text-gray-700' }}">
+            </i>
+            <span>{{ request()->is('koreksi') ? '• Koreksi Kata •' : 'Koreksi Kata' }}</span>
         </a>
 
+        {{-- Ajukan --}}
         <a href="{{ url('/ajukan') }}"
-            class="block font-poppins font-semibold text-lg text-black tracking-wide hover:text-blue-400 relative 
-        after:absolute after:left-1/2 after:bottom-0 after:w-0 after:h-[2px] after:bg-blue-400 
-        after:transition-all after:duration-300 hover:after:w-1/2 hover:after:-translate-x-1/2">
-            Ajukan Kata
+            class="flex items-center justify-center gap-2 font-semibold text-base py-2.5 rounded-xl 
+            transition-all
+            {{ request()->is('ajukan') ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/60' }}">
+            <i class="fa-solid fa-plus
+              {{ request()->is('ajukan') ? 'text-blue-600' : 'text-gray-700' }}">
+            </i>
+            <span>{{ request()->is('ajukan') ? '• Ajukan Kata •' : 'Ajukan Kata' }}</span>
         </a>
 
+        {{-- Tentang --}}
         <a href="{{ url('/tentang') }}"
-            class="block font-poppins font-semibold text-black text-lg tracking-wide hover:text-blue-400 relative 
-        after:absolute after:left-1/2 after:bottom-0 after:w-0 after:h-[2px] after:bg-blue-400 
-        after:transition-all after:duration-300 hover:after:w-1/2 hover:after:-translate-x-1/2">
-            Tentang Kami
+            class="flex items-center justify-center gap-2 font-semibold text-base py-2.5 rounded-xl 
+            transition-all
+            {{ request()->is('tentang') ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/60' }}">
+            <i class="fa-solid fa-circle-info
+              {{ request()->is('tentang') ? 'text-blue-600' : 'text-gray-700' }}">
+            </i>
+            <span>{{ request()->is('tentang') ? '• Tentang Kami •' : 'Tentang Kami' }}</span>
         </a>
     </div>
-
 </nav>

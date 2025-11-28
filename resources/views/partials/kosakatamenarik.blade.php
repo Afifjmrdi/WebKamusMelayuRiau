@@ -4,7 +4,17 @@
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
+<style>
+    /* Hilang di Chrome, Edge, Safari */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
 
+    /* Hilang di Firefox */
+    .scrollbar-hide {
+        scrollbar-width: none;
+    }
+</style>
 <section class="px-6 md:px-16 py-14 bg-gradient-to-b from-blue-50 to-white overflow-hidden">
     <div class="text-center mb-10" data-aos="fade-up" data-aos-delay="150">
         <h2 class="text-3xl md:text-4xl font-poppins font-semibold text-blue-800 mb-2">
@@ -16,48 +26,26 @@
     </div>
 
     <!-- Baris 1 -->
-    <div class="relative w-full overflow-visible" data-aos="fade-up" data-aos-delay="150">
-        <div class="flex gap-6 animate-scroll-left">
+    <div class="relative w-full overflow-x-auto scrollbar-hide pt-4" data-aos="fade-up" data-aos-delay="150">
+        <div class="flex gap-4 sm:gap-6 animate-scroll-left snap-x snap-mandatory">
             @foreach($kosakataHariIni->take(8) as $kata)
             <div
-                class="flex-shrink-0 w-64 h-48 p-5 rounded-3xl bg-gradient-to-br from-blue-100 to-white border border-blue-200 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-[1.04] cursor-pointer group"
+                class="flex-shrink-0 w-44 h-40 sm:w-64 sm:h-48 p-4 rounded-2xl bg-gradient-to-br from-blue-100 to-white border border-blue-200 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-[1.04] cursor-pointer group snap-start"
                 onclick="showDetail(
-            '{{ addslashes($kata->kata) }}',
-            '{{ addslashes($kata->kelas_kata) }}',
-            '{{ addslashes($kata->suku_kata) }}',
-            '{{ addslashes($kata->arti) }}',
-            '{{ addslashes($kata->contoh) }}',
-            '{{ addslashes($kata->asal_kamus) }}'
-          )">
-                <h3 class="font-poppins font-semibold text-lg text-blue-700 mb-2 truncate group-hover:text-blue-900">
+                '{{ addslashes($kata->kata) }}',
+                '{{ addslashes($kata->kelas_kata) }}',
+                '{{ addslashes($kata->suku_kata) }}',
+                '{{ addslashes($kata->arti) }}',
+                '{{ addslashes($kata->contoh) }}',
+                '{{ addslashes($kata->asal_kamus) }}'
+            )">
+                <h3 class="font-poppins font-semibold text-base sm:text-lg text-blue-700 mb-1 truncate group-hover:text-blue-900">
                     {{ $kata->kata }}
                 </h3>
-                <p class="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                <p class="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-3">
                     <span class="font-medium text-blue-500">Artinya:</span> {{ $kata->arti }}
                 </p>
-                <div class="mt-3 text-xs text-blue-400 italic group-hover:text-blue-600">
-                    klik untuk detail ➜
-                </div>
-            </div>
-            @endforeach
-            @foreach($kosakataHariIni->take(8) as $kata)
-            <div
-                class="flex-shrink-0 w-64 h-48 p-5 rounded-3xl bg-gradient-to-br from-blue-100 to-white border border-blue-200 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-[1.04] cursor-pointer group"
-                onclick="showDetail(
-            '{{ addslashes($kata->kata) }}',
-            '{{ addslashes($kata->kelas_kata) }}',
-            '{{ addslashes($kata->suku_kata) }}',
-            '{{ addslashes($kata->arti) }}',
-            '{{ addslashes($kata->contoh) }}',
-            '{{ addslashes($kata->asal_kamus) }}'
-          )">
-                <h3 class="font-poppins font-semibold text-lg text-blue-700 mb-2 truncate group-hover:text-blue-900">
-                    {{ $kata->kata }}
-                </h3>
-                <p class="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                    <span class="font-medium text-blue-500">Artinya:</span> {{ $kata->arti }}
-                </p>
-                <div class="mt-3 text-xs text-blue-400 italic group-hover:text-blue-600">
+                <div class="mt-2 text-[10px] sm:text-xs text-blue-400 italic group-hover:text-blue-600">
                     klik untuk detail ➜
                 </div>
             </div>
@@ -66,54 +54,33 @@
     </div>
 
     <!-- Baris 2 -->
-    <div class="relative w-full overflow-visible mt-8" data-aos="fade-up" data-aos-delay="300">
-        <div class="flex gap-6 animate-scroll-right">
+    <div class="relative w-full overflow-x-auto pt-4 mt-8 scrollbar-hide" data-aos="fade-up" data-aos-delay="300">
+        <div class="flex gap-4 sm:gap-6 animate-scroll-right snap-x snap-mandatory">
             @foreach($kosakataHariIni->slice(8) as $kata)
             <div
-                class="flex-shrink-0 w-64 h-48 p-5 rounded-3xl bg-gradient-to-br from-white to-blue-50 border border-blue-200 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-[1.04] cursor-pointer group"
+                class="flex-shrink-0 w-44 h-40 sm:w-64 sm:h-48 p-4 rounded-2xl bg-gradient-to-br from-white to-blue-50 border border-blue-200 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-[1.04] cursor-pointer group snap-start"
                 onclick="showDetail(
-            '{{ addslashes($kata->kata) }}',
-            '{{ addslashes($kata->kelas_kata) }}',
-            '{{ addslashes($kata->suku_kata) }}',
-            '{{ addslashes($kata->arti) }}',
-            '{{ addslashes($kata->contoh) }}',
-            '{{ addslashes($kata->asal_kamus) }}'
-          )">
-                <h3 class="font-poppins font-semibold text-lg text-blue-700 mb-2 truncate group-hover:text-blue-900">
+                '{{ addslashes($kata->kata) }}',
+                '{{ addslashes($kata->kelas_kata) }}',
+                '{{ addslashes($kata->suku_kata) }}',
+                '{{ addslashes($kata->arti) }}',
+                '{{ addslashes($kata->contoh) }}',
+                '{{ addslashes($kata->asal_kamus) }}'
+            )">
+                <h3 class="font-poppins font-semibold text-base sm:text-lg text-blue-700 mb-1 truncate group-hover:text-blue-900">
                     {{ $kata->kata }}
                 </h3>
-                <p class="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                <p class="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-3">
                     <span class="font-medium text-blue-500">Artinya:</span> {{ $kata->arti }}
                 </p>
-                <div class="mt-3 text-xs text-blue-400 italic group-hover:text-blue-600">
-                    klik untuk detail ➜
-                </div>
-            </div>
-            @endforeach
-            @foreach($kosakataHariIni->slice(8) as $kata)
-            <div
-                class="flex-shrink-0 w-64 h-48 p-5 rounded-3xl bg-gradient-to-br from-white to-blue-50 border border-blue-200 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-[1.04] cursor-pointer group"
-                onclick="showDetail(
-            '{{ addslashes($kata->kata) }}',
-            '{{ addslashes($kata->kelas_kata) }}',
-            '{{ addslashes($kata->suku_kata) }}',
-            '{{ addslashes($kata->arti) }}',
-            '{{ addslashes($kata->contoh) }}',
-            '{{ addslashes($kata->asal_kamus) }}'
-          )">
-                <h3 class="font-poppins font-semibold text-lg text-blue-700 mb-2 truncate group-hover:text-blue-900">
-                    {{ $kata->kata }}
-                </h3>
-                <p class="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                    <span class="font-medium text-blue-500">Artinya:</span> {{ $kata->arti }}
-                </p>
-                <div class="mt-3 text-xs text-blue-400 italic group-hover:text-blue-600">
+                <div class="mt-2 text-[10px] sm:text-xs text-blue-400 italic group-hover:text-blue-600">
                     klik untuk detail ➜
                 </div>
             </div>
             @endforeach
         </div>
     </div>
+
 </section>
 
 <style>
