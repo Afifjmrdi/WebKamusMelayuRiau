@@ -435,16 +435,17 @@
 
         // Daftar kelas kata
         const daftarKelasKata = [
-            'Nomina (Kata Benda)',
-            'Verba (Kata Kerja)',
-            'Adjektiva (Kata Sifat)',
-            'Adverbia (Kata Keterangan)',
-            'Pronomina (Kata Ganti)',
-            'Numeralia (Kata Bilangan)',
-            'Preposisi (Kata Depan)',
-            'Konjungsi (Kata Penghubung)',
-            'Interjeksi (Kata Seru)',
-            'Partikel'
+            'n', // Nomina (Kata Benda)
+            'v', // Verba (Kata Kerja)
+            'adj', // Adjektiva (Kata Sifat)
+            'adv', // Adverbia (Kata Keterangan)
+            'pron', // Pronomina (Kata Ganti)
+            'num', // Numeralia (Kata Bilangan)
+            'prep', // Preposisi (Kata Depan)
+            'konj', // Konjungsi (Kata Penghubung)
+            'interj', // Interjeksi (Kata Seru)
+            'part', // Partikel
+
         ];
 
         // Ubah input nilai_baru jika "kelas_kata" dipilih

@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-    use Illuminate\Http\Request;
-    use App\Models\Kamus;
-    use Illuminate\Support\Str;
-    use App\Models\Kata;
-    use App\Models\Visitor;
-    use Carbon\Carbon;
-    use App\Imports\KamusImport;
-    use Maatwebsite\Excel\Facades\Excel;
-    use Illuminate\Support\Facades\DB;
-    use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Request;
+use App\Models\Kamus;
+use Illuminate\Support\Str;
+use App\Models\Kata;
+use App\Models\Visitor;
+use Carbon\Carbon;
+use App\Imports\KamusImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class KamusController extends Controller
-    {
+{
     public function index()
     {
 
@@ -50,6 +50,7 @@ class KamusController extends Controller
     {
         $q = trim((string) $request->input('q', ''));
         $filterAsal = $request->input('asal_kamus', '');
+        $mode = $request->input('mode', 'indo-ke-daerah'); // baru: mode pencarian
 
         // jika kosong, return kosong (frontend tidak akan menampilkan)
         if ($q === '') {
@@ -59,34 +60,54 @@ class KamusController extends Controller
         // limit hasil agar tidak membebani
         $limit = 100;
 
-        // cache key
-        $cacheKey = 'search:' . md5($q . '|' . $filterAsal);
+        // cache key (sertakan mode agar cache tidak tercampur)
+        $cacheKey = 'search:' . md5($q . '|' . $filterAsal . '|' . $mode);
 
-        $results = Cache::remember($cacheKey, 30, function () use ($q, $filterAsal, $limit) {
+        $results = Cache::remember($cacheKey, 30, function () use ($q, $filterAsal, $limit, $mode) {
             $query = Kamus::query()
                 ->select('id', 'kata', 'suku_kata', 'kelas_kata', 'arti', 'contoh', 'asal_kamus');
 
-            // prioritas: kata yang mulai dengan q dulu (fast), lalu kata mengandung q, lalu arti/contoh
-            $query->where(function ($sub) use ($q) {
-                $sub->where('kata', 'LIKE', $q . '%')
-                    ->orWhere('kata', 'LIKE', '%' . $q . '%')
-                    ->orWhere('arti', 'LIKE', '%' . $q . '%')
-                    ->orWhere('contoh', 'LIKE', '%' . $q . '%');
-            });
+            if ($mode === 'daerah-ke-indo') {
+                // cari di kolom arti / contoh — user memasukkan kata daerah
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('arti', 'LIKE', $q . '%')
+                        ->orWhere('arti', 'LIKE', '%' . $q . '%')
+                        ->orWhere('contoh', 'LIKE', '%' . $q . '%');
+                });
 
-            // optional filter sumber kamus
-            if (!empty($filterAsal)) {
-                $query->where('asal_kamus', $filterAsal);
+                if (!empty($filterAsal)) {
+                    $query->where('asal_kamus', $filterAsal);
+                }
+
+                // ordering: prefer where arti startswith q
+                $query->orderByRaw("
+                CASE
+                    WHEN arti LIKE ? THEN 0
+                    WHEN arti LIKE ? THEN 1
+                    ELSE 2
+                END", [$q . '%', '%' . $q . '%'])
+                    ->orderBy('kata');
+            } else {
+                // default: indo -> daerah (sekarang behavior lama)
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('kata', 'LIKE', $q . '%')
+                        ->orWhere('kata', 'LIKE', '%' . $q . '%')
+                        ->orWhere('arti', 'LIKE', '%' . $q . '%')
+                        ->orWhere('contoh', 'LIKE', '%' . $q . '%');
+                });
+
+                if (!empty($filterAsal)) {
+                    $query->where('asal_kamus', $filterAsal);
+                }
+
+                $query->orderByRaw("
+                CASE
+                    WHEN kata LIKE ? THEN 0
+                    WHEN kata LIKE ? THEN 1
+                    ELSE 2
+                END", [$q . '%', '%' . $q . '%'])
+                    ->orderBy('kata');
             }
-
-            // ordering: prefer exact/prefix matches first
-            $query->orderByRaw("
-            CASE
-                WHEN kata LIKE ? THEN 0
-                WHEN kata LIKE ? THEN 1
-                ELSE 2
-            END", [$q . '%', '%' . $q . '%'])
-                ->orderBy('kata');
 
             return $query->limit($limit)->get();
         });
@@ -94,12 +115,43 @@ class KamusController extends Controller
         // highlight hasil (safe-ish, kita return HTML snippets; frontend akan gunakan innerHTML)
         $escaped = preg_quote($q, '/');
 
-        $results = $results->map(function ($item) use ($escaped) {
+        $results = $results->map(function ($item) use ($escaped, $q, $mode) {
             $kata = $item->kata ?? '';
             $arti = is_string($item->arti) ? $item->arti : (string) $item->arti;
             $contoh = $item->contoh ?? '';
 
-            // highlight (case-insensitive)
+            if ($mode === 'daerah-ke-indo') {
+                // display: user searched a *term in arti* (bahasa daerah)
+                // For frontend compatibility, we set:
+                // - kata => the searched term (so it shows as the left column)
+                // - kata_highlight => highlighted searched term
+                // - arti => the Indonesian lemma (item->kata)
+                // - arti_highlight => Indonesian lemma (no highlight or could highlight matching portion)
+                $kata_display = $q;
+                $kata_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e($kata_display));
+                $arti_highlight = e(Str::limit($kata, 150)); // item->kata used as 'arti' now
+                $contoh_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($contoh, 120)));
+
+                return [
+                    'id' => $item->id,
+                    // tampilkan kata yang dicari di sisi kiri (bahasa daerah)
+                    'kata' => $kata_display,
+                    'kata_highlight' => $kata_highlight,
+                    'suku_kata' => $item->suku_kata,
+                    // kelas_kata tetap dari item (tipe kata)
+                    'kelas_kata' => $item->kelas_kata,
+                    // arti => tunjukkan lemma Indonesianya
+                    'arti' => $kata,
+                    'arti_highlight' => $arti_highlight,
+                    'contoh' => $item->contoh,
+                    'contoh_highlight' => $contoh_highlight,
+                    'asal_kamus' => $item->asal_kamus,
+                    // tambahan: original_kata untuk keperluan debugging/display lain
+                    'original_kata' => $item->kata,
+                ];
+            }
+
+            // default (indo -> daerah) : behavior lama
             $kata_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e($kata));
             $arti_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($arti, 150)));
             $contoh_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($contoh, 120)));
@@ -120,6 +172,7 @@ class KamusController extends Controller
 
         return response()->json($results);
     }
+
 
     public function trackSearch(Request $request)
     {
@@ -258,6 +311,22 @@ class KamusController extends Controller
 
         // ✅ tambahan ini
         $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
+
+        $kelasKataList = [
+            'Nomina (Kata Benda)',
+            'Verba (Kata Kerja)',
+            'Adjektiva (Kata Sifat)',
+            'Adverbia (Kata Keterangan)',
+            'Pronomina (Kata Ganti)',
+            'Numeralia (Kata Bilangan)',
+            'Preposisi (Kata Depan)',
+            'Konjungsi (Kata Penghubung)',
+            'Interjeksi (Kata Seru)',
+            'Partikel'
+        ];
+
+        $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
+
 
         return view('admin.kamus', compact(
             'dataKamus',

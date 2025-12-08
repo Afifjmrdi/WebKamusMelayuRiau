@@ -11,8 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Jangan tambahkan AdminAuth di sini ya anata 💋
-        // Biarkan kosong atau tambahkan global middleware seperti HandleCors dll
+    // Jangan tambahkan AdminAuth di sini ya anata 💋
+    // Biarkan kosong atau tambahkan global middleware seperti HandleCors dll
+    $middleware->append(\App\Http\Middleware\SetLocale::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

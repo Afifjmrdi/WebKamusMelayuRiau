@@ -1,17 +1,22 @@
+{{-- Fonts --}}
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
     body {
-        font-family: 'Poppins', sans-serif, 'jetbrains';
+        font-family: 'Poppins', sans-serif;
     }
 
     nav * {
         font-family: "JetBrains Mono", monospace !important;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.4px;
     }
 
     .menu-item {
         position: relative;
+        font-weight: 600;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        padding: 4px 0;
     }
 
     .menu-item::after {
@@ -19,10 +24,10 @@
         position: absolute;
         width: 0%;
         height: 1px;
-        bottom: -2px;
+        bottom: -3px;
         left: 0;
         background-color: #000;
-        transition: width 0.3s ease;
+        transition: width 0.25s ease;
     }
 
     .menu-item:hover::after,
@@ -35,58 +40,10 @@
         overflow-y: auto;
     }
 
-    #resultsList li {
-        min-height: 3rem;
-    }
-
-    #resultsList li span {
-        display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    @keyframes twinkle {
-
-        0%,
-        100% {
-            opacity: 0.2;
-            transform: scale(0.9);
-        }
-
-        50% {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-    }
-
-
-    .search-active #subtitle {
-        margin-top: -30px;
-    }
-
-    .search-active #title {
-        font-size: 2rem;
-        margin-top: -20px;
-        margin-bottom: 10px;
-    }
-
-    .search-active #searchContainer {
-        margin-top: -10px;
-    }
-
-    /* semua bintang */
-    .star {
-        opacity: 0.9;
-        transform-origin: center;
-        /* mutar dari tengah */
-        animation: spin-slow 2s linear infinite, twinkle 3s ease-in-out infinite;
-    }
-
-    /* bikin rotasi */
+    /* Stars */
     @keyframes spin-slow {
         from {
-            transform: rotate(0deg);
+            transform: rotate(0);
         }
 
         to {
@@ -94,138 +51,138 @@
         }
     }
 
-    /* bikin kedip */
     @keyframes twinkle {
 
         0%,
         100% {
-            opacity: 0.9;
+            opacity: .8;
         }
 
         50% {
-            opacity: 0.3;
+            opacity: .25;
         }
     }
 
-    /* variasi random supaya nggak seragam */
+    .star {
+        opacity: .9;
+        animation: spin-slow 6s linear infinite, twinkle 3s ease-in-out infinite;
+    }
+
     .star:nth-child(3n) {
-        animation-duration: 8s, 2.5s;
-        /* spin lebih cepat, kedip lebih singkat */
+        animation-duration: 8s, 2.4s;
     }
 
     .star:nth-child(4n) {
-        animation-duration: 12s, 4s;
-        /* spin lebih lambat, kedip lebih panjang */
+        animation-duration: 13s, 4s;
         animation-direction: reverse, alternate;
-        /* arah rotasi kebalikan */
     }
 
     .star:nth-child(5n) {
-        animation-duration: 15s, 3.5s;
-        opacity: 0.7;
-        /* agak redup */
+        animation-duration: 16s, 3.6s;
+        opacity: .7;
     }
 </style>
 
-{{-- Navbar --}}
-<nav x-data="{ open: false }" class="px-6 md:px-20 py-4 absolute top-0 left-0 w-full z-50">
+<style>
+    /* ANIMASI CARD MENU DESKTOP */
+    @keyframes fadeSlideDown {
+        0% {
+            opacity: 0;
+            transform: translateY(-12px);
+        }
 
-    <div class="flex items-center justify-between h-16">
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-        {{-- Left: Logo + Desktop Menu --}}
-        <div class="flex items-center gap-10">
-            <img src="{{ asset('assets/BBP.png') }}" alt="Logo"
-                class="mt-2 h-20 w-auto object-contain">
+    .menu-anim {
+        animation: fadeSlideDown 0.6s ease forwards;
+    }
+</style>
 
-            <ul class="hidden md:flex gap-10 text-gray font-semibold">
-                <li><a href="{{ url('/') }}"
-                        class="menu-item pb-1 {{ request()->is('/') ? 'active' : '' }}">BERANDA</a></li>
 
-                <li><a href="{{ url('/koreksi') }}"
-                        class="menu-item pb-1 {{ request()->is('koreksi') ? 'active' : '' }}">KOREKSI KOSAKATA</a></li>
+{{-- NAVBAR --}}
+<nav x-data="{ open: false }"
+    class="px-4 md:px-16 py-1 absolute top-0 left-0 w-full z-50 bg-transparent">
 
-                <li><a href="{{ url('/ajukan') }}"
-                        class="menu-item pb-1 {{ request()->is('ajukan') ? 'active' : '' }}">AJUKAN KOSAKATA</a></li>
+    <!-- WRAPPER -->
+    <div class="flex items-center justify-between w-full px-4">
+        <!-- LOGO (always left) -->
+        <div class="flex-shrink-0">
+            <img src="{{ asset('assets/BBP.png') }}"
+                alt="Logo BBP"
+                class="block"
+                style="width: 140px; height: auto; object-fit: contain;">
+        </div>
 
-                <li><a href="{{ url('/tentang') }}"
-                        class="menu-item pb-1 {{ request()->is('tentang') ? 'active' : '' }}">TENTANG KAMI</a></li>
-                <li><a href="{{ url('/tentang') }}"
-                        class="menu-item pb-1 {{ request()->is('tentang') ? 'active' : '' }}">BOOKMARK</a></li>
+        <!-- DESKTOP MENU (center) -->
+        <div class="hidden md:flex flex-grow justify-center menu-anim">
+            <ul class="flex items-center gap-10 
+                bg-[#e5e5e5]/80 backdrop-blur-sm 
+                px-8 py-3 rounded-lg shadow-sm border border-black/5">
+
+                <li><a href="{{ url('/') }}" class="menu-item {{ request()->is('/') ? 'active' : '' }}">BERANDA</a></li>
+                <li><a href="{{ url('/koreksi') }}" class="menu-item {{ request()->is('koreksi') ? 'active' : '' }}">KOREKSI</a></li>
+                <li><a href="{{ url('/ajukan') }}" class="menu-item {{ request()->is('ajukan') ? 'active' : '' }}">AJUKAN</a></li>
+                <li><a href="{{ url('/tentang') }}" class="menu-item {{ request()->is('tentang') ? 'active' : '' }}">TENTANG</a></li>
+
             </ul>
         </div>
 
-        {{-- Hamburger Button --}}
-        <button @click="open = !open"
-            class="md:hidden relative w-10 h-10 rounded-full bg-white shadow-sm border border-gray-300 
-           flex items-center justify-center transition-all duration-300"
-            :class="open ? 'ring-2 ring-blue-400 rotate-180' : ''">
+        <!-- HAMBURGER (right on mobile) -->
+        <div class="md:hidden flex-shrink-0">
+            <button @click="open = !open"
+                class="relative w-10 h-10 rounded-full bg-white shadow border border-gray-300
+                flex items-center justify-center transition-all duration-300"
+                :class="open ? 'ring-2 ring-blue-400 rotate-180' : ''">
 
-            <span class="absolute w-6 h-0.5 bg-black transition-all duration-300"
-                :class="open ? 'rotate-45 translate-y-0' : '-translate-y-2'"></span>
+                <span class="absolute w-6 h-0.5 bg-black transition-all duration-300"
+                    :class="open ? 'rotate-45 translate-y-0' : '-translate-y-2'"></span>
 
-            <span class="absolute w-6 h-0.5 bg-black transition-all duration-300"
-                :class="open ? 'opacity-0' : 'opacity-100'"></span>
+                <span class="absolute w-6 h-0.5 bg-black transition-all duration-300"
+                    :class="open ? 'opacity-0' : 'opacity-100'"></span>
 
-            <span class="absolute w-6 h-0.5 bg-black transition-all duration-300"
-                :class="open ? '-rotate-45 translate-y-0' : 'translate-y-2'"></span>
-        </button>
+                <span class="absolute w-6 h-0.5 bg-black transition-all duration-300"
+                    :class="open ? '-rotate-45 translate-y-0' : 'translate-y-2'"></span>
+            </button>
+        </div>
 
+        <!-- SPACER UNTUK DESKTOP -->
+        <div class="hidden md:block flex-shrink-0" style="width: 140px;"></div>
 
     </div>
-
-    {{-- Dropdown Mobile --}}
+    <!-- MOBILE MENU DROPDOWN -->
     <div x-show="open"
         x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 -translate-y-4 scale-95"
+        x-transition:enter-start="opacity-0 -translate-y-3 scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-        x-transition:leave-end="opacity-0 -translate-y-4 scale-95"
-        class="md:hidden mx-4 mt-4 p-5 rounded-2xl shadow-xl border border-white/10
-           backdrop-blur-2xl bg-white/25 space-y-2 text-center">
+        x-transition:leave-end="opacity-0 -translate-y-3 scale-95"
+        class="md:hidden mx-4 mt-4 p-5 rounded-2xl shadow-xl backdrop-blur-xl
+    bg-white/60 border border-white/20 space-y-3 text-center">
 
-        {{-- Beranda --}}
-        <a href="{{ url('/') }}"
-            class="flex items-center justify-center gap-2 font-semibold text-base py-2.5 rounded-xl 
-            transition-all
-            {{ request()->is('/') ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/60' }}">
-            <i class="fa-solid fa-house
-              {{ request()->is('/') ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600' }}">
-            </i>
-            <span>{{ request()->is('/') ? '• Beranda •' : 'Beranda' }}</span>
-        </a>
+        @php
+        $menus = [
+        ['url' => '/', 'label' => 'Beranda', 'icon' => ''],
+        ['url' => '/koreksi', 'label' => 'Koreksi Kata', 'icon' => ''],
+        ['url' => '/ajukan', 'label' => 'Ajukan Kata', 'icon' => ''],
+        ['url' => '/tentang', 'label' => 'Tentang Kami', 'icon' => ''],
+        ];
+        @endphp
 
-        {{-- Koreksi --}}
-        <a href="{{ url('/koreksi') }}"
-            class="flex items-center justify-center gap-2 font-semibold text-base py-2.5 rounded-xl 
-            transition-all
-            {{ request()->is('koreksi') ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/60' }}">
-            <i class="fa-solid fa-pen-to-square
-              {{ request()->is('koreksi') ? 'text-blue-600' : 'text-gray-700' }}">
-            </i>
-            <span>{{ request()->is('koreksi') ? '• Koreksi Kata •' : 'Koreksi Kata' }}</span>
-        </a>
+        @foreach ($menus as $m)
+        <a href="{{ url($m['url']) }}"
+            class="flex items-center justify-center gap-3 font-semibold text-base py-3 rounded-xl transition-all
+               {{ request()->is(trim($m['url'], '/')) ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/70' }}">
 
-        {{-- Ajukan --}}
-        <a href="{{ url('/ajukan') }}"
-            class="flex items-center justify-center gap-2 font-semibold text-base py-2.5 rounded-xl 
-            transition-all
-            {{ request()->is('ajukan') ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/60' }}">
-            <i class="fa-solid fa-plus
-              {{ request()->is('ajukan') ? 'text-blue-600' : 'text-gray-700' }}">
-            </i>
-            <span>{{ request()->is('ajukan') ? '• Ajukan Kata •' : 'Ajukan Kata' }}</span>
+            <i class="fa-solid fa-{{ $m['icon'] }}"></i>
+            <span>{{ $m['label'] }}</span>
         </a>
+        @endforeach
 
-        {{-- Tentang --}}
-        <a href="{{ url('/tentang') }}"
-            class="flex items-center justify-center gap-2 font-semibold text-base py-2.5 rounded-xl 
-            transition-all
-            {{ request()->is('tentang') ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/60' }}">
-            <i class="fa-solid fa-circle-info
-              {{ request()->is('tentang') ? 'text-blue-600' : 'text-gray-700' }}">
-            </i>
-            <span>{{ request()->is('tentang') ? '• Tentang Kami •' : 'Tentang Kami' }}</span>
-        </a>
     </div>
+
 </nav>

@@ -423,17 +423,18 @@
                         <select id="kelas_kata" name="kelas_kata"
                             class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             <option value="">Pilih kelas kata</option>
-                            <option>Nomina (Kata Benda)</option>
-                            <option>Verba (Kata Kerja)</option>
-                            <option>Adjektiva (Kata Sifat)</option>
-                            <option>Adverbia (Kata Keterangan)</option>
-                            <option>Pronomina (Kata Ganti)</option>
-                            <option>Numeralia (Kata Bilangan)</option>
-                            <option>Preposisi (Kata Depan)</option>
-                            <option>Konjungsi (Kata Penghubung)</option>
-                            <option>Interjeksi (Kata Seru)</option>
-                            <option>Partikel</option>
+                            <option value="n">n Nomina (Kata Benda)</option>
+                            <option value="v">v Verba (Kata Kerja)</option>
+                            <option value="adj">adj Adjektiva (Kata Sifat)</option>
+                            <option value="adv">adv Adverbia (Kata Keterangan)</option>
+                            <option value="pron">pron Pronomina (Kata Ganti)</option>
+                            <option value="num">num Numeralia (Kata Bilangan)</option>
+                            <option value="prep">prep Preposisi (Kata Depan)</option>
+                            <option value="konj">konj Konjungsi (Kata Penghubung)</option>
+                            <option value="interj">interj Interjeksi (Kata Seru)</option>
+                            <option value="part">part Partikel</option>
                         </select>
+
                     </div>
 
                     <!-- Nama Pengaju -->
