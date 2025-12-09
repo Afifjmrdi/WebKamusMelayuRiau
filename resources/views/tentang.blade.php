@@ -165,6 +165,43 @@
             color: #4b5563;
             line-height: 1.7;
         }
+
+        /* Collaboration Card */
+        .collab-card {
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(14px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, .25);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            transition: .3s ease;
+        }
+
+        .collab-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (min-width: 820px) {
+            .collab-card {
+                flex-direction: row;
+                align-items: center;
+                text-align: left;
+            }
+        }
+
+        .logo-img {
+            width: 160px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 6px rgba(255, 255, 255, .3));
+            transition: .4s ease;
+        }
+
+        .collab-card:hover .logo-img {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
@@ -199,33 +236,26 @@
                 Kami berkomitmen menghadirkan kamus digital yang interaktif dan mudah diakses untuk menjaga kelestarian bahasa daerah Riau.
             </p>
         </div>
-        {{-- Card Kolaborasi PCR & BBPR --}}
-        <div class="relative z-10 fade-up mt-5 px-6 max-w-6xl mx-auto">
-            <div class="kampus-card shadow-lg flex items-center justify-between bg-white rounded-lg p-6">
-                <!-- Logo kiri -->
-                <img src="{{ asset('assets/pcr.png') }}"
-                    alt="Politeknik Caltex Riau"
-                    class="kampus-logo w-24 md:w-32 object-contain">
+        {{-- Collaboration Card --}}
+        <div class="relative z-10 max-w-6xl mx-auto px-6 mt-2 fade-up">
+            <div class="collab-card shadow-lg">
+                <img src="{{ asset('assets/pcr.png') }}" class="logo-img" alt="Politeknik Caltex Riau">
 
-                <!-- Konten tengah -->
-                <div class="kampus-content flex-1 px-6 text-center md:text-left">
-                    <h2 class="text-2xl md:text-3xl mb-3 font-semibold">
+                <div class="flex-1">
+                    <h2 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-3">
                         Kolaborasi dengan Politeknik Caltex Riau
                     </h2>
-                    <p class="mb-3 text-gray-700 leading-relaxed">
-                        Pengembangan <span class="font-semibold text-blue-500">Kamus Balai Bahasa Riau</span> merupakan hasil sinergi antara
-                        Balai Bahasa Provinsi Riau dan <span class="font-semibold text-blue-500">Politeknik Caltex Riau (PCR)</span>.
+                    <p class="text-gray-700 leading-relaxed mb-3">
+                        Proyek ini dikembangkan melalui program magang mahasiswa Politeknik Caltex Riau (PCR) bersama
+                        Balai Bahasa Provinsi Riau.
                     </p>
                     <p class="text-gray-700 leading-relaxed">
-                        Kolaborasi ini terwujud melalui program magang mahasiswa Politeknik Caltex Riau (PCR).
-                        Proses pengembangan sistem, perancangan antarmuka, serta implementasi teknologi sepenuhnya
-                        dikerjakan oleh mahasiswa magang di bawah arahan dan pendampingan dari Balai Bahasa Provinsi Riau.
+                        Mulai dari perancangan antarmuka, sistem pencarian, hingga seluruh implementasi teknis dilakukan oleh
+                        mahasiswa magang dengan bimbingan dari Balai Bahasa.
                     </p>
                 </div>
-                <!-- Logo kanan -->
-                <img src="{{ asset('assets/BBP.png') }}"
-                    alt="Politeknik Caltex Riau"
-                    class="kampus-logo w-24 md:w-32 object-contain mb-4 md:mb-0 md:ml-6">
+
+                <img src="{{ asset('assets/BBP.png') }}" class="logo-img" alt="Balai Bahasa Riau">
             </div>
         </div>
 

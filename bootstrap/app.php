@@ -10,11 +10,17 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
+
     ->withMiddleware(function (Middleware $middleware) {
-    // Jangan tambahkan AdminAuth di sini ya anata 💋
-    // Biarkan kosong atau tambahkan global middleware seperti HandleCors dll
-    $middleware->append(\App\Http\Middleware\SetLocale::class);
+
+        // Pasang global middleware
+        $middleware->append(\App\Http\Middleware\RecordVisitor::class);
+
+        // Middleware lain
+        $middleware->append(\App\Http\Middleware\SetLocale::class);
     })
+
+    
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })

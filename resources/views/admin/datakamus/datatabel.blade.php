@@ -140,7 +140,7 @@
                                 </p>
 
                                 <ul class="small text-muted ps-3">
-                                    <li>File harus format .xlsx / .csv</li>
+                                    <li>File harus format .xlsx</li>
                                     <li>Batas ukuran: <b>200MB</b></li>
                                 </ul>
 

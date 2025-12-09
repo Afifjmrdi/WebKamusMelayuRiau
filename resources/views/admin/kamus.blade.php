@@ -244,16 +244,16 @@
                                         <select id="kelas_kata" name="kelas_kata"
                                             class="w-full p-3 rounded-xl border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                             <option value="">Pilih kelas kata</option>
-                                            <option value="Nomina (Kata Benda)">Nomina (Kata Benda)</option>
-                                            <option value="Verba (Kata Kerja)">Verba (Kata Kerja)</option>
-                                            <option value="Adjektiva (Kata Sifat)">Adjektiva (Kata Sifat)</option>
-                                            <option value="Adverbia (Kata Keterangan)">Adverbia (Kata Keterangan)</option>
-                                            <option value="Pronomina (Kata Ganti)">Pronomina (Kata Ganti)</option>
-                                            <option value="Numeralia (Kata Bilangan)">Numeralia (Kata Bilangan)</option>
-                                            <option value="Preposisi (Kata Depan)">Preposisi (Kata Depan)</option>
-                                            <option value="Konjungsi (Kata Penghubung)">Konjungsi (Kata Penghubung)</option>
-                                            <option value="Interjeksi (Kata Seru)">Interjeksi (Kata Seru)</option>
-                                            <option value="Partikel">Partikel</option>
+                                            <option value="n">n Nomina (Kata Benda)</option>
+                                            <option value="v">v Verba (Kata Kerja)</option>
+                                            <option value="adj">adj Adjektiva (Kata Sifat)</option>
+                                            <option value="adv">adv Adverbia (Kata Keterangan)</option>
+                                            <option value="pron">pron Pronomina (Kata Ganti)</option>
+                                            <option value="num">num Numeralia (Kata Bilangan)</option>
+                                            <option value="prep">prep Preposisi (Kata Depan)</option>
+                                            <option value="konj">konj Konjungsi (Kata Penghubung)</option>
+                                            <option value="interj">interj Interjeksi (Kata Seru)</option>
+                                            <option value="part">part Partikel</option>
                                         </select>
                                     </div>
 

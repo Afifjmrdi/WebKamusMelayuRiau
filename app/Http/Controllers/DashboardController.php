@@ -44,22 +44,6 @@ class DashboardController extends Controller
         $monthlyData = $this->getMonthlyDataAll();
         $barChartData = $this->getMonthlyDataPerKamus();
 
-        // ======= Hitung visitor =======
-        $ip = request()->ip();
-        $today = Carbon::today();
-
-        // Cek apakah IP ini sudah tercatat hari ini
-        $exists = Visitor::where('ip_address', $ip)
-            ->whereDate('visited_at', $today)
-            ->exists();
-
-        if (!$exists) {
-            Visitor::create([
-                'ip_address' => $ip,
-                'visited_at' => now(),
-            ]);
-        }
-
         // Ambil total pengunjung
         $totalVisitors = Visitor::count();
 

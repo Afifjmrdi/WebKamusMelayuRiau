@@ -365,7 +365,7 @@
                 {{-- Detail hasil --}}
                 <div id="resultDetail" class="mt-4 hidden opacity-0 transform scale-95 transition-all duration-500 w-full max-w-[1200px] mx-auto"></div>
 
-                {{-- Card Info --}}
+                {{-- Card Informasi --}}
                 <div id="cardContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 px-2 sm:px-0" data-aos="fade-up" data-aos-delay="800">
                     <div class="bg-white shadow-md hover:shadow-lg p-4 rounded-md text-center cursor-pointer">
                         <h3 class="text-blue-600 font-bold text-sm md:text-base">7.000+ KosaKata</h3>
@@ -380,7 +380,7 @@
                         <p class="text-gray-600 text-xs md:text-sm leading-snug">Kamus Indonesia -<br>Kuantan Singingi</p>
                     </div>
                     <div class="bg-white shadow-md hover:shadow-lg p-4 rounded-md text-center cursor-pointer">
-                        <h3 class="text-blue-600 font-bold text-sm md:text-base">Ada 45.000+ KosaKata</h3>
+                        <h3 class="text-blue-600 font-bold text-sm md:text-base">Ada 20.000+ KosaKata</h3>
                         <p class="text-gray-600 text-xs md:text-sm leading-snug">Di Keseluruhan -<br>Kamus</p>
                     </div>
                 </div>

@@ -17,21 +17,6 @@ class KamusController extends Controller
 {
     public function index()
     {
-
-        $ip = request()->ip();
-        $today = Carbon::today();
-
-        $exists = Visitor::where('ip_address', $ip)
-            ->whereDate('visited_at', $today)
-            ->exists();
-
-        if (!$exists) {
-            Visitor::create([
-                'ip_address' => $ip,
-                'visited_at' => now(),
-            ]);
-        }
-
         // Kosakata hari ini
         $kosakataHariIni = Cache::remember('kosakata_menarik_' . date('Y-m-d'), 86400, function () {
             return \App\Models\Kata::inRandomOrder()->limit(16)->get();
@@ -313,16 +298,16 @@ class KamusController extends Controller
         $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
 
         $kelasKataList = [
-            'Nomina (Kata Benda)',
-            'Verba (Kata Kerja)',
-            'Adjektiva (Kata Sifat)',
-            'Adverbia (Kata Keterangan)',
-            'Pronomina (Kata Ganti)',
-            'Numeralia (Kata Bilangan)',
-            'Preposisi (Kata Depan)',
-            'Konjungsi (Kata Penghubung)',
-            'Interjeksi (Kata Seru)',
-            'Partikel'
+            'n',        // Nomina (Kata Benda)
+            'v',        // Verba (Kata Kerja)
+            'adj',      // Adjektiva (Kata Sifat)
+            'adv',      // Adverbia (Kata Keterangan)
+            'pron',     // Pronomina (Kata Ganti)
+            'num',      // Numeralia (Kata Bilangan)
+            'prep',     // Preposisi (Kata Depan)
+            'konj',     // Konjungsi (Kata Penghubung)
+            'interj',   // Interjeksi (Kata Seru)
+            'part',     // Partikel
         ];
 
         $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
