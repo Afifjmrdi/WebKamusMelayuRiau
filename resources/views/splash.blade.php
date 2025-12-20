@@ -53,21 +53,23 @@
     </video>
 
     <script>
-        // Kalau sudah pernah masuk web di TAB ini → langsung ke home
-        if (sessionStorage.getItem('hasEnteredWeb')) {
-            window.location.href = "{{ route('home') }}";
+        // Jika sudah pernah masuk web → langsung ke home
+        if (sessionStorage.getItem('hasEnteredWeb') === 'true') {
+            window.location.replace("{{ route('home') }}");
         }
 
         const video = document.getElementById('splashVideo');
 
-        video.addEventListener('ended', () => {
-            // Tandai bahwa user sudah masuk web
-            sessionStorage.setItem('hasEnteredWeb', 'true');
+        // Pastikan video benar-benar siap
+        video.addEventListener('loadeddata', () => {
+            video.play();
+        });
 
-            window.location.href = "{{ route('home') }}";
+        video.addEventListener('ended', () => {
+            sessionStorage.setItem('hasEnteredWeb', 'true');
+            window.location.replace("{{ route('home') }}");
         });
     </script>
-
 
 </body>
 

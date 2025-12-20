@@ -171,41 +171,56 @@
             line-height: 1.7;
         }
 
-        /* Collaboration Card */
+        /* CARD UTAMA */
         .collab-card {
             background: rgba(255, 255, 255, 0.35);
             backdrop-filter: blur(14px);
             border-radius: 1.5rem;
             padding: 2rem;
             border: 1px solid rgba(255, 255, 255, .25);
+
             display: flex;
             flex-direction: column;
+            align-items: center;
+            /* ⬅️ PENTING */
             gap: 2rem;
-            transition: .3s ease;
+
+            text-align: center;
+            /* ⬅️ MOBILE CENTER */
         }
 
-        .collab-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+        /* WRAPPER LOGO */
+        .logo-wrapper {
+            display: flex;
+            justify-content: center;
+            /* ⬅️ LOGO DI TENGAH */
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
         }
 
+        /* LOGO */
+        .logo-img {
+            width: 150px;
+            max-width: 40vw;
+            object-fit: contain;
+            filter: drop-shadow(0 0 6px rgba(255, 255, 255, .4));
+        }
+
+        /* ========================= */
+        /* DESKTOP (TIDAK BERUBAH)   */
+        /* ========================= */
         @media (min-width: 820px) {
             .collab-card {
                 flex-direction: row;
                 align-items: center;
                 text-align: left;
             }
-        }
 
-        .logo-img {
-            width: 160px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 6px rgba(255, 255, 255, .3));
-            transition: .4s ease;
-        }
-
-        .collab-card:hover .logo-img {
-            transform: scale(1.05);
+            .logo-wrapper {
+                flex-direction: column;
+                width: auto;
+            }
         }
     </style>
 </head>

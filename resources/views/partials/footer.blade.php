@@ -22,7 +22,12 @@
             <div>
                 <h3 class="font-semibold text-gray-800 mb-2 text-sm">Menu</h3>
                 <ul class="space-y-1.5 text-[12px] sm:text-[13px]">
-                    <li><a href="{{ url('/') }}" class="hover:text-blue-600 transition">Beranda</a></li>
+                    <li>
+                        <a href="{{ route('home') }}"
+                            class="hover:text-blue-600 transition">
+                            Beranda
+                        </a>
+                    </li>
                     <li><a href="{{ url('/koreksi') }}" class="hover:text-blue-600 transition">Koreksi Kosakata</a></li>
                     <li><a href="{{ url('/ajukan') }}" class="hover:text-blue-600 transition">Ajukan Kosakata</a></li>
                     <li><a href="{{ url('/tentang') }}" class="hover:text-blue-600 transition">Tentang Kami</a></li>

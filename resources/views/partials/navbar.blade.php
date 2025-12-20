@@ -123,16 +123,41 @@
                 bg-[#e5e5e5]/80 backdrop-blur-sm 
                 px-8 py-3 rounded-lg shadow-sm border border-black/5">
 
-                <li><a href="{{ url('/') }}" class="menu-item {{ request()->is('/') ? 'active' : '' }}">BERANDA</a></li>
-                <li><a href="{{ url('/koreksi') }}" class="menu-item {{ request()->is('koreksi') ? 'active' : '' }}">KOREKSI</a></li>
-                <li><a href="{{ url('/ajukan') }}" class="menu-item {{ request()->is('ajukan') ? 'active' : '' }}">AJUKAN</a></li>
-                <li><a href="{{ url('/tentang') }}" class="menu-item {{ request()->is('tentang') ? 'active' : '' }}">TENTANG</a></li>
+                <li>
+                    <a href="{{ route('home') }}"
+                        class="menu-item {{ request()->routeIs('home') ? 'active' : '' }}">
+                        BERANDA
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('koreksi.index') }}"
+                        class="menu-item {{ request()->routeIs('koreksi.index') ? 'active' : '' }}">
+                        KOREKSI
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('ajukan.index') }}"
+                        class="menu-item {{ request()->routeIs('ajukan.index') ? 'active' : '' }}">
+                        AJUKAN
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('tentang') }}"
+                        class="menu-item {{ request()->routeIs('tentang') ? 'active' : '' }}">
+                        TENTANG
+                    </a>
+                </li>
+
                 <li>
                     <a href="{{ route('kamus.istilah') }}"
                         class="menu-item {{ request()->routeIs('kamus.istilah') ? 'active' : '' }}">
                         KAMUS ISTILAH
                     </a>
                 </li>
+
 
             </ul>
         </div>
@@ -172,20 +197,18 @@
 
         @php
         $menus = [
-        ['url' => '/', 'label' => 'Beranda', 'icon' => ''],
-        ['url' => '/koreksi', 'label' => 'Koreksi Kata', 'icon' => ''],
-        ['url' => '/ajukan', 'label' => 'Ajukan Kata', 'icon' => ''],
-        ['url' => '/tentang', 'label' => 'Tentang Kami', 'icon' => ''],
-        ['url' => '/kamusistilah', 'label' => 'Kamus Istilah', 'icon' => ''],
+        ['route' => 'home', 'label' => 'Beranda'],
+        ['route' => 'koreksi.index', 'label' => 'Koreksi Kata'],
+        ['route' => 'ajukan.index', 'label' => 'Ajukan Kata'],
+        ['route' => 'tentang', 'label' => 'Tentang Kami'],
+        ['route' => 'kamus.istilah', 'label' => 'Kamus Istilah'],
         ];
         @endphp
 
         @foreach ($menus as $m)
-        <a href="{{ url($m['url']) }}"
+        <a href="{{ route($m['route']) }}"
             class="flex items-center justify-center gap-3 font-semibold text-base py-3 rounded-xl transition-all
-               {{ request()->is(trim($m['url'], '/')) ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/70' }}">
-
-            <i class="fa-solid fa-{{ $m['icon'] }}"></i>
+        {{ request()->routeIs($m['route']) ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-white/70' }}">
             <span>{{ $m['label'] }}</span>
         </a>
         @endforeach

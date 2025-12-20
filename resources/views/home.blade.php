@@ -12,6 +12,8 @@
 
         <title>Kamus Balai Bahasa Riau</title>
         @vite(['resources/css/app.css'])
+        <link rel="stylesheet" href="{{ asset('build/assets/app-BL-OqM7X.css') }}">
+<script type="module" src="{{ asset('build/assets/app-Bj43h_rG.js') }}"></script>
         <!-- di head -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="..." crossorigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
