@@ -3,8 +3,77 @@
 @section('title', 'Data Pengajuan Kosakata')
 
 @section('content')
-<div class="card shadow-sm border-0" style="margin-top: -3px;">
 
+<style>
+    /* Toolbar */
+    .toolbar-pengajuan {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 14px 16px;
+    }
+
+    .toolbar-pengajuan .form-control,
+    .toolbar-pengajuan .form-select {
+        height: 42px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+    .toolbar-pengajuan .btn {
+        height: 42px;
+        border-radius: 10px;
+        font-weight: 500;
+    }
+
+    /* Table */
+    .table-pengajuan thead th {
+        font-size: 13px;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: #6b7280;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .table-pengajuan tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    /* Badge */
+    .badge-kata {
+        background: #eef2ff;
+        color: #3730a3;
+        font-weight: 600;
+        letter-spacing: .03em;
+    }
+
+    .badge-kelas {
+        background: #e0f2fe;
+        color: #075985;
+        font-weight: 600;
+    }
+
+    .badge-status {
+        padding: 6px 14px;
+        font-size: 12px;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    /* Action button */
+    .btn-action {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+</style>
+
+<div class="card shadow-sm border-0" style="margin-top: -3px;">
     {{-- Header --}}
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bx bx-book"></i> Pengajuan Kosakata Baru</h5>
@@ -12,24 +81,33 @@
 
     {{-- Filter & Search --}}
     <div class="card-body">
+        <form method="GET"
+            action="{{ route('admin.pengajuan') }}"
+            id="filterForm"
+            class="toolbar-pengajuan d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
 
-        <form method="GET" action="{{ route('admin.pengajuan') }}" id="filterForm" class="row g-3 align-items-end mb-3">
+            {{-- LEFT --}}
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                {{-- Search --}}
+                <div class="search-wrapper position-relative">
+                    <i class="bx bx-search text-muted"
+                        style="
+                            position:absolute;
+                            left:12px;
+                            top:50%;
+                            transform:translateY(-50%);
+                            font-size:18px;
+                            pointer-events:none;"></i>
 
-            {{-- Cari Kata --}}
-            <div class="col-md-4 d-flex align-items-end">
-                <div class="flex-grow-1 me-2">
-                    <label class="form-label text-secondary fw-semibold">Cari Kata</label>
-                    <input type="text" name="search" class="form-control" placeholder="Cari kata..." value="{{ request('search') }}">
+                    <input type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        class="form-control ps-5"
+                        style="width:260px"
+                        placeholder="Cari kata...">
                 </div>
-                <button type="submit" class="btn btn-primary mb-0" style="height: 38px;">
-                    <i class="bx bx-search"></i>
-                </button>
-            </div>
 
-            {{-- Asal Kamus --}}
-            <div class="col-md-3">
-                <label class="form-label text-secondary fw-semibold">Asal Kamus</label>
-                <select name="asal_kamus" class="form-select auto-submit">
+                <select name="asal_kamus" class="form-select auto-submit" style="width:220px">
                     <option value="">Semua Kamus</option>
                     @foreach($daftarAsalKamus as $kamus)
                     <option value="{{ $kamus }}" {{ request('asal_kamus') == $kamus ? 'selected' : '' }}>
@@ -37,34 +115,26 @@
                     </option>
                     @endforeach
                 </select>
-            </div>
 
-            {{-- Status --}}
-            <div class="col-md-3">
-                <label class="form-label text-secondary fw-semibold">Status</label>
-                <select name="status" class="form-select auto-submit">
+                <select name="status" class="form-select auto-submit" style="width:180px">
                     <option value="">Semua Status</option>
                     <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Pending</option>
                     <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
                     <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                 </select>
-            </div>
 
-            {{-- Tombol Reset sejajar kanan --}}
-            <div class="col-md-2 d-flex justify-content-end">
-                <a href="{{ route('admin.pengajuan') }}" class="btn btn-secondary w-100">
-                    <i class="bx bx-reset"></i> Reset
+                <a href="{{ route('admin.pengajuan') }}"
+                    class="btn btn-outline-secondary">
+                    <i class="bx bx-reset"></i>
                 </a>
             </div>
-
         </form>
     </div>
 
-
     {{-- Tabel Pengajuan --}}
     <div class="table-responsive">
-        <table class="table table-striped align-middle">
-            <thead class="table-light text-center">
+        <table class="table table-hover align-middle table-pengajuan">
+            <thead class="text-center">
                 <tr>
                     <th>No</th>
                     <th>Kamus Tujuan</th>
@@ -87,7 +157,7 @@
                     <td>{{ $item->asal_kamus }}</td>
 
                     <td>
-                        <span class="badge bg-label-primary">
+                        <span class="badge badge-kata">
                             {{ strtoupper($item->kata) }}
                         </span>
                     </td>
@@ -95,7 +165,7 @@
                     <td>{{ $item->suku_kata ?? '-' }}</td>
 
                     <td>
-                        <span class="badge bg-info text-dark">
+                        <span class="badge badge-kelas">
                             {{ strtoupper($item->kelas_kata) }}
                         </span>
                     </td>
@@ -108,42 +178,46 @@
 
                     <td>
                         @if($item->status === 'diterima')
-                        <span class="badge bg-success">Diterima</span>
+                        <span class="badge badge-status bg-success">Diterima</span>
                         @elseif($item->status === 'ditolak')
-                        <span class="badge bg-danger">Ditolak</span>
+                        <span class="badge badge-status bg-danger">Ditolak</span>
                         @else
-                        <span class="badge bg-warning text-dark">Pending</span>
+                        <span class="badge badge-status bg-warning text-dark">Pending</span>
                         @endif
                     </td>
 
-                    <td class="d-flex gap-2 justify-content-center">
-                        {{-- Tombol Detail --}}
-                        <button class="btn btn-sm btn-outline-primary btn-detail" data-bs-toggle="modal"
-                            data-item='@json($item)'>
-                            <i class="bx bx-show-alt"></i>
-                        </button>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
 
-                        @if($item->status == 'menunggu' || empty($item->status))
-                        {{-- Tombol Terima --}}
-                        <button class="btn btn-sm btn-success btn-approve" data-id="{{ $item->id }}">
-                            <i class="bx bx-check"></i>
-                        </button>
+                            <button class="btn btn-outline-primary btn-action btn-detail"
+                                data-item='@json($item)'>
+                                <i class="bx bx-show-alt"></i>
+                            </button>
 
-                        {{-- Tombol Tolak --}}
-                        <button class="btn btn-sm btn-danger btn-reject" data-id="{{ $item->id }}">
-                            <i class="bx bx-x"></i>
-                        </button>
-                        @else
-                        {{-- Hapus (kalau status sudah final) --}}
-                        <button class="btn btn-sm btn-outline-danger btn-delete" data-id="{{ $item->id }}">
-                            <i class="bx bx-trash"></i>
-                        </button>
-                        @endif
+                            @if($item->status == 'menunggu' || empty($item->status))
+                            <button class="btn btn-success btn-action btn-approve"
+                                data-id="{{ $item->id }}">
+                                <i class="bx bx-check"></i>
+                            </button>
+
+                            <button class="btn btn-danger btn-action btn-reject"
+                                data-id="{{ $item->id }}">
+                                <i class="bx bx-x"></i>
+                            </button>
+                            @else
+                            <button class="btn btn-outline-danger btn-action btn-delete"
+                                data-id="{{ $item->id }}">
+                                <i class="bx bx-trash"></i>
+                            </button>
+                            @endif
+
+                        </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="10" class="text-center text-muted py-3">
+                    <td colspan="10" class="text-center text-muted py-4">
+                        <i class="bx bx-info-circle me-1"></i>
                         Belum ada pengajuan kosakata.
                     </td>
                 </tr>
@@ -152,78 +226,117 @@
         </table>
     </div>
 
-
     {{-- Pagination --}}
     <div class="card-footer bg-white">
         @include('admin.pagination', ['paginator' => $data])
     </div>
 </div>
 
-<style>
-    /* Turunkan posisi modal sedikit dari atas layar */
-    .modal-dialog {
-        margin-top: 90px !important;
-    }
-</style>
-
-{{-- Modal Detail --}}
+{{-- 📘 Modal Detail Pengajuan Kosakata --}}
 <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Detail Pengajuan Kosakata</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow rounded-3">
+
+            {{-- Header --}}
+            <div class="modal-header border-0 px-4 py-4 align-items-start">
+                <div>
+                    <h6 class="fw-bold mb-0">Detail Pengajuan Kosakata</h6>
+                    <small class="text-muted">Informasi kosakata yang diajukan</small>
+                </div>
+                <button type="button"
+                    class="btn-close mt-6"
+                    data-bs-dismiss="modal">
+                </button>
             </div>
-            <div class="modal-body">
-                <table class="table table-borderless">
-                    <tr>
-                        <th>Kamus Tujuan</th>
-                        <td id="detailAsalKamus"></td>
-                    </tr>
-                    <tr>
-                        <th>Kata</th>
-                        <td id="detailKata"></td>
-                    </tr>
-                    <tr>
-                        <th>Suku Kata</th>
-                        <td id="detailSukukata"></td>
-                    </tr>
-                    <tr>
-                        <th>Kelas Kata</th>
-                        <td id="detailKelas"></td>
-                    </tr>
-                    <tr>
-                        <th>Arti</th>
-                        <td id="detailArti"></td>
-                    </tr>
-                    <tr>
-                        <th>Contoh</th>
-                        <td id="detailContoh"></td>
-                    </tr>
-                    <tr>
-                        <th>Pengaju</th>
-                        <td id="detailPengaju"></td>
-                    </tr>
-                    <tr>
-                        <th>Email</th>
-                        <td id="detailEmail"></td>
-                    </tr>
-                    <tr>
-                        <th>Alasan</th>
-                        <td id="detailAlasan"></td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td id="detailStatus"></td>
-                    </tr>
-                    <tr>
-                        <th>Tanggal</th>
-                        <td id="detailTanggal"></td>
-                    </tr>
-                </table>
+
+            {{-- Body --}}
+            <div class="modal-body px-4 py-3">
+
+                {{-- Status --}}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <div class="text-muted small">Status</div>
+                        <span id="detailStatus"
+                            class="badge rounded-pill px-3 py-2"></span>
+                    </div>
+
+                    <div class="text-end">
+                        <div class="text-muted small">Tanggal</div>
+                        <div class="fw-semibold" id="detailTanggal"></div>
+                    </div>
+                </div>
+
+                {{-- Kamus --}}
+                <div class="mb-3">
+                    <div class="text-muted small">Kamus Tujuan</div>
+                    <div class="fw-semibold" id="detailAsalKamus"></div>
+                </div>
+
+                {{-- Kosakata --}}
+                <div class="border rounded-3 p-3 mb-3 bg-light">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <div class="text-muted small">Kata</div>
+                            <div class="fw-bold fs-5" id="detailKata"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="text-muted small">Suku Kata</div>
+                            <div class="fw-semibold" id="detailSukukata"></div>
+                        </div>
+
+                        <div class="col-md-4 text-md-end">
+                            <div class="text-muted small">Kelas Kata</div>
+                            <span id="detailKelas"
+                                class="badge bg-info text-dark px-3 py-2"></span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Arti & Contoh --}}
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="text-muted small">Arti</div>
+                        <div class="border rounded-3 p-2 bg-white small"
+                            id="detailArti"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Contoh</div>
+                        <div class="border rounded-3 p-2 bg-white fst-italic small"
+                            id="detailContoh"></div>
+                    </div>
+                </div>
+
+                {{-- Alasan --}}
+                <div class="mb-3">
+                    <div class="text-muted small">Alasan Pengajuan</div>
+                    <div class="border rounded-3 p-2 bg-white small"
+                        id="detailAlasan"></div>
+                </div>
+
+                {{-- Pengaju --}}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="text-muted small">Nama Pengaju</div>
+                        <div class="fw-semibold" id="detailPengaju"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Email Pengaju</div>
+                        <div class="fw-semibold" id="detailEmail"></div>
+                    </div>
+                </div>
+
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+
+            {{-- Footer --}}
+            <div class="modal-footer border-0 px-4 py-2">
+                <button type="button"
+                    class="btn btn-secondary px-4"
+                    data-bs-dismiss="modal">
+                    Tutup
+                </button>
             </div>
         </div>
     </div>
@@ -313,7 +426,23 @@
             document.getElementById('detailPengaju').innerText = item.asal_pengaju;
             document.getElementById('detailEmail').innerText = item.email_pengaju ?? '-';
             document.getElementById('detailAlasan').innerText = item.alasan_pengajuan;
-            document.getElementById('detailStatus').innerText = item.status ?? 'menunggu';
+            const statusEl = document.getElementById('detailStatus');
+
+            let status = item.status ?? 'menunggu';
+            let label = 'Pending';
+            let badgeClass = 'bg-warning text-dark';
+
+            if (status === 'diterima') {
+                label = 'Diterima';
+                badgeClass = 'bg-success';
+            } else if (status === 'ditolak') {
+                label = 'Ditolak';
+                badgeClass = 'bg-danger';
+            }
+
+            statusEl.className = `badge px-3 py-2 rounded-pill ${badgeClass}`;
+            statusEl.innerText = label;
+
             document.getElementById('detailTanggal').innerText = new Date(item.created_at).toLocaleString();
             new bootstrap.Modal(document.getElementById('detailModal')).show();
         });

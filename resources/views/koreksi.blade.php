@@ -210,7 +210,7 @@
 
         {{-- Kartu panduan koreksi kata --}}
         <div class="relative z-10 fade-up mt-12 px-4 max-w-5xl mx-auto text-center">
-            <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-6 flex items-center justify-center gap-3 animate-fade-in font-jetbrains">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-6 flex items-center justify-center gap-3 animate-fade-in">
                 <span class="text-indigo-600 animate-bounce-slow"></span>
                 Koreksi Kata
             </h1>
@@ -272,7 +272,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-indigo-700 text-lg mb-1">Langkah 3</h3>
-                            <p class="text-gray-700">Tentukan <b>bagian mana</b> yang ingin dikoreksi.</p>
+                            <p class="text-gray-700">Tentukan <b>bagian</b> yang ingin dikoreksi.</p>
                         </div>
                     </div>
                 </div>
@@ -344,39 +344,95 @@
     </section>
 
 
-    {{-- Modal Form --}}
-    <div id="modalKoreksi" class="modal-bg">
-        <div class="modal">
-            <h2>📝 Formulir Koreksi Kata</h2>
-            <hr class="mb-6 border-gray-200">
-            <form id="koreksiForm">
+    {{-- Modal Koreksi --}}
+    <div id="modalKoreksi"
+        class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm
+           flex justify-center items-start
+           overflow-y-auto px-4 py-10">
+
+        {{-- Card --}}
+        <div class="bg-white w-full max-w-3xl rounded-lg shadow-xl p-5 md:p-8">
+
+            {{-- Header --}}
+            <div class="mb-6">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    📝 Formulir Koreksi Kata
+                </h2>
+
+                {{-- Divider --}}
+                <div class="mt-3 grid grid-cols-1 md:grid-cols-2">
+                    <div class="h-px bg-gray-300 md:col-span-2 w-full"></div>
+                </div>
+            </div>
+
+            <form id="koreksiForm" class="space-y-6">
                 @csrf
 
-                <div class="form-group">
+                {{-- ========================= --}}
+                {{-- Asal Kamus & Kata --}}
+                {{-- ========================= --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+
+                    {{-- Asal Kamus --}}
                     <div>
-                        <label for="asal_kamus">Asal Kamus<span class="text-red-500">*</span></label>
-                        <select id="asal_kamus" name="asal_kamus" required>
+                        <label class="font-semibold block">
+                            Asal Kamus <span class="text-red-500">*</span>
+                        </label>
+                        <select id="asal_kamus" name="asal_kamus" required
+                            class="w-full h-[48px] px-4 pr-10 rounded-md
+               border border-gray-200 bg-gray-50
+               appearance-none leading-normal
+               bg-no-repeat bg-[right_0.75rem_center] bg-[length:14px_14px]
+               focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            style="background-image: url('{{ asset('assets/down.png') }}'); background-size: 18px 18px;">
                             <option value="">Pilih asal kamus</option>
                             @foreach ($kamusList as $asal)
                             <option value="{{ $asal }}">{{ $asal }}</option>
                             @endforeach
                         </select>
                     </div>
+
+                    {{-- Kata --}}
                     <div>
-                        <label for="kata">Kata<span class="text-red-500">*</span></label>
-                        <div class="flex gap-2">
-                            <input type="text" id="kata" name="kata" placeholder="Masukkan kata...">
-                            <button type="button" id="btnCari" class="btn btn-primary whitespace-nowrap">Cari</button>
+                        <label class="font-semibold block">
+                            Kata <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex items-start gap-2">
+                            <input type="text" id="kata" name="kata"
+                                class="flex-1 h-[48px] px-4 rounded-md
+                                   border border-gray-200 bg-gray-50 leading-none
+                                   focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                placeholder="Masukkan kata...">
+
+                            <button type="button" id="btnCari"
+                                class="h-[48px] px-5 rounded-lg
+                                   bg-indigo-600 text-white
+                                   hover:bg-indigo-700 whitespace-nowrap">
+                                Cari
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <div id="detailKata" class="hidden"></div>
 
-                <div class="form-group mt-6">
+                {{-- ========================= --}}
+                {{-- Bagian Dikoreksi & Nilai Baru --}}
+                {{-- ========================= --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+
+                    {{-- Bagian Dikoreksi --}}
                     <div>
-                        <label for="bagian_dikoreksi">Bagian Dikoreksi<span class="text-red-500">*</span></label>
-                        <select id="bagian_dikoreksi" name="bagian_dikoreksi">
+                        <label class="font-semibold block">
+                            Bagian Dikoreksi <span class="text-red-500">*</span>
+                        </label>
+                        <select id="bagian_dikoreksi" name="bagian_dikoreksi"
+                            class="w-full h-[48px] px-4 pr-10 rounded-md
+               border border-gray-200 bg-gray-50
+               appearance-none leading-normal
+               bg-no-repeat bg-[right_0.75rem_center] bg-[length:14px_14px]
+               focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            style="background-image: url('{{ asset('assets/down.png') }}'); background-size: 18px 18px;">
                             <option value="">Pilih bagian</option>
                             <option value="kata">Kata</option>
                             <option value="suku_kata">Suku Kata</option>
@@ -386,32 +442,70 @@
                         </select>
                     </div>
 
+                    {{-- Nilai Baru --}}
                     <div id="nilaiBaruWrapper">
-                        <label for="nilai_baru">Nilai Baru / Versi Benar<span class="text-red-500">*</span></label>
-                        <input type="text" id="nilai_baru" name="nilai_baru" placeholder="Tuliskan versi yang benar...">
+                        <label class="font-semibold block">
+                            Versi Benar <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="nilai_baru" name="nilai_baru"
+                            class="w-full h-[48px] px-4 rounded-md
+                               border border-gray-200 bg-gray-50 leading-none
+                               focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="Tuliskan versi yang benar...">
                     </div>
                 </div>
 
-                <div class="mt-6">
-                    <label for="alasan">Alasan Koreksi<span class="text-red-500">*</span></label>
-                    <textarea id="alasan" name="alasan" placeholder="Jelaskan alasan pengajuan koreksi..."></textarea>
+                {{-- ========================= --}}
+                {{-- Alasan --}}
+                {{-- ========================= --}}
+                <div>
+                    <label class="font-semibold block">
+                        Alasan Koreksi <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="alasan" name="alasan" rows="3"
+                        class="w-full p-3 rounded-md
+                           border border-gray-200 bg-gray-50 resize-none"
+                        placeholder="Jelaskan alasan koreksi..."></textarea>
                 </div>
 
-                <div class="form-group mt-6">
+                {{-- ========================= --}}
+                {{-- Nama & Email --}}
+                {{-- ========================= --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="nama_pengoreksi">Nama Pengoreksi<span class="text-red-500">*</span></label>
-                        <input type="text" id="nama_pengoreksi" name="nama_pengoreksi" placeholder="Nama Anda">
+                        <label class="font-semibold block">
+                            Nama Pengoreksi <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="nama_pengoreksi" name="nama_pengoreksi" placeholder="Contoh : BBPR"
+                            class="w-full h-[48px] px-4 rounded-md
+                               border border-gray-200 bg-gray-50">
                     </div>
+
                     <div>
-                        <label for="email_pengoreksi">Email (opsional)</label>
-                        <input type="email" id="email_pengoreksi" name="email_pengoreksi" placeholder="Email Anda (opsional)">
+                        <label class="font-semibold block">Email (Opsional)</label>
+                        <input type="email" id="email_pengoreksi" name="email_pengoreksi" placeholder="Contoh : balaibahasariau@gmail.com"
+                            class="w-full h-[48px] px-4 rounded-md
+                               border border-gray-200 bg-gray-50">
                     </div>
                 </div>
-                <hr class="my-4 border-gray-200">
 
-                <div class="flex justify-end mt-8 gap-3">
-                    <button type="button" class="btn btn-secondary" id="btnClose">Batal</button>
-                    <button type="submit" class="btn btn-primary">Kirim Koreksi</button>
+                {{-- Divider bawah --}}
+                <div class="mt-3 grid grid-cols-1 md:grid-cols-2">
+                    <div class="h-px bg-gray-300 md:col-span-2 w-full"></div>
+                </div>
+
+                {{-- Tombol --}}
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="btnClose"
+                        class="btn-secondary px-5 py-2 rounded-md bg-gray-200 hover:bg-gray-300 font-medium">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2 h-[50px] rounded-md
+           bg-indigo-600 text-white font-semibold
+           hover:bg-indigo-700 transition">
+                        Kirim Koreksi
+                    </button>
                 </div>
             </form>
         </div>
@@ -433,20 +527,48 @@
             if (e.target === modal) modal.style.display = 'none';
         });
 
-        // Daftar kelas kata
-        const daftarKelasKata = [
-            'n', // Nomina (Kata Benda)
-            'v', // Verba (Kata Kerja)
-            'adj', // Adjektiva (Kata Sifat)
-            'adv', // Adverbia (Kata Keterangan)
-            'pron', // Pronomina (Kata Ganti)
-            'num', // Numeralia (Kata Bilangan)
-            'prep', // Preposisi (Kata Depan)
-            'konj', // Konjungsi (Kata Penghubung)
-            'interj', // Interjeksi (Kata Seru)
-            'part', // Partikel
-
+        const daftarKelasKata = [{
+                value: 'n',
+                label: 'Nomina'
+            },
+            {
+                value: 'v',
+                label: 'Verba'
+            },
+            {
+                value: 'adj',
+                label: 'Adjektiva'
+            },
+            {
+                value: 'adv',
+                label: 'Adverbia'
+            },
+            {
+                value: 'pron',
+                label: 'Pronomina'
+            },
+            {
+                value: 'num',
+                label: 'Numeralia'
+            },
+            {
+                value: 'prep',
+                label: 'Preposisi'
+            },
+            {
+                value: 'konj',
+                label: 'Konjungsi'
+            },
+            {
+                value: 'interj',
+                label: 'Interjeksi'
+            },
+            {
+                value: 'part',
+                label: 'Partikel'
+            },
         ];
+
 
         // Ubah input nilai_baru jika "kelas_kata" dipilih
         bagianSelect.addEventListener('change', () => {
@@ -454,16 +576,30 @@
 
             if (bagian === 'kelas_kata') {
                 nilaiWrapper.innerHTML = `
-                <label for="nilai_baru">Nilai Baru / Versi Benar</label>
-                <select id="nilai_baru" name="nilai_baru">
+                <label for="nilai_baru" class="font-semibold block">
+                    Versi Benar <span class="text-red-500">*</span>
+                </label>
+                <select id="nilai_baru" name="nilai_baru"
+                    class="w-full h-[48px] px-4 pr-10 rounded-md
+                           border border-gray-200 bg-gray-50
+                           appearance-none leading-normal
+                           bg-no-repeat bg-right bg-[length:16px_16px]
+                           bg-[url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%236B7280%22%3E%3Cpath fill-rule=%22evenodd%22 d=%22M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z%22 clip-rule=%22evenodd%22/%3E%3C/svg%3E')]
+                           focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     <option value="">Pilih kelas kata</option>
-                    ${daftarKelasKata.map(k => `<option value="${k}">${k}</option>`).join('')}
+                    ${daftarKelasKata.map(item =>`<option value="${item.value}">${item.label}</option>`).join('')}
                 </select>
             `;
             } else {
                 nilaiWrapper.innerHTML = `
-                <label for="nilai_baru">Nilai Baru / Versi Benar</label>
-                <input type="text" id="nilai_baru" name="nilai_baru" placeholder="Tuliskan versi yang benar...">
+                <label for="nilai_baru" class="font-semibold block">
+                    Versi Benar <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="nilai_baru" name="nilai_baru"
+                    class="w-full h-[48px] px-4 rounded-md
+                           border border-gray-200 bg-gray-50 leading-none
+                           focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    placeholder="Tuliskan versi yang benar...">
             `;
             }
         });

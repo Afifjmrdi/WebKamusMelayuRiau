@@ -83,6 +83,13 @@
                     </a>
                 </li>
 
+                <li class="menu-item {{ request()->routeIs('admin.kamus-istilah.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.kamus-istilah.dataistilah') }}" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-book"></i>
+                        <div>Data Kamus Istilah</div>
+                    </a>
+                </li>
+
                 <!-- Pelayanan -->
                 <li class="menu-header small text-uppercase"><span class="menu-header-text">Pelayanan</span></li>
 

@@ -25,20 +25,29 @@
         if (Request::is('admin/dashboard')) {
         $pageName = 'Dashboard';
         $icon = 'fa-solid fa-chart-line';
+
+        } elseif (Request::is('admin/kamus-istilah*')) {
+        $pageName = 'Kamus Istilah';
+        $icon = 'fa-solid fa-book-open';
+
         } elseif (Request::is('admin/kamus*')) {
         $pageName = 'Kamus';
         $icon = 'fa-solid fa-book';
+
         } elseif (Request::is('admin/pelayanan/pengajuan*')) {
         $pageName = 'Pengajuan';
         $icon = 'fa-solid fa-file-circle-check';
+
         } elseif (Request::is('admin/pelayanan/koreksikata*')) {
         $pageName = 'Koreksi Kata';
         $icon = 'fa-solid fa-pen-to-square';
+
         } else {
         $pageName = 'Halaman';
         $icon = 'fa-solid fa-layer-group';
         }
         @endphp
+
 
         <div class="navbar-nav align-items-center">
             <div class="nav-item d-flex align-items-center">

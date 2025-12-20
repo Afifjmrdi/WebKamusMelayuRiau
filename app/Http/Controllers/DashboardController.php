@@ -9,6 +9,7 @@ use App\Models\KoreksiKata;
 use App\Models\PengajuanKosakata;
 use Carbon\Carbon;
 use App\Models\Visitor;
+use App\Models\KamusIstilah;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -40,9 +41,32 @@ class DashboardController extends Controller
         // Data kosakata terbaru (5 data paling baru)
         $recentKata = Kamus::latest()->take(5)->get();
 
+        // KOREKSI KATA
+        $koreksiDiterima = KoreksiKata::where('status', 'diterima')->count();
+        $koreksiDitolak  = KoreksiKata::where('status', 'ditolak')->count();
+
+        // jumlah data kamus istilah
+        $totalIstilah = KamusIstilah::count();
+
+        // AJUKAN KOSAKATA
+        $ajukanDiterima = PengajuanKosakata::where('status', 'diterima')->count();
+        $ajukanDitolak  = PengajuanKosakata::where('status', 'ditolak')->count();
+
         // Data chart bulanan (jumlah kosakata masuk per bulan)
         $monthlyData = $this->getMonthlyDataAll();
         $barChartData = $this->getMonthlyDataPerKamus();
+
+        // DATA CHART
+        $kelasKataChart = KamusIstilah::selectRaw('kelas_kata, COUNT(*) as total')
+            ->whereNotNull('kelas_kata')
+            ->groupBy('kelas_kata')
+            ->orderBy('kelas_kata')
+            ->get();
+
+        // PECAH KHUSUS UNTUK CHART.JS
+        $kelasLabels = $kelasKataChart->pluck('kelas_kata');
+        $kelasTotals = $kelasKataChart->pluck('total');
+
 
         // Ambil total pengunjung
         $totalVisitors = Visitor::count();
@@ -60,7 +84,14 @@ class DashboardController extends Controller
             'recentKata',
             'monthlyData',
             'totalVisitors',
-            'barChartData'
+            'koreksiDiterima',
+            'koreksiDitolak',
+            'ajukanDiterima',
+            'ajukanDitolak',
+            'barChartData',
+            'totalIstilah',
+            'kelasLabels',
+            'kelasTotals'   
         ));
     }
 

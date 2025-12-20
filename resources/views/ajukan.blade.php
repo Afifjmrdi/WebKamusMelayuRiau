@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pelayanan Ajukan KosaKata - Kamus Balai Bahasa Riau</title>
+    <title>Pelayanan Ajukan Kosakata - Kamus Balai Bahasa Riau</title>
     @vite(['resources/css/app.css'])
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="//unpkg.com/alpinejs" defer></script>
 
     <style>
@@ -23,6 +24,10 @@
 
         .font-jetbrains {
             font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
         }
 
         .guide-card {
@@ -194,10 +199,26 @@
                 transform: scale(1);
             }
         }
+
+        /* Mobile: modal tetap punya batas tinggi supaya tidak keluar dari card */
+        @media (max-width: 768px) {
+            #modalAjukan>div {
+                max-height: 90vh !important;
+                overflow-y: auto !important;
+            }
+        }
+
+        /* Laptop/desktop: modal bebas tanpa scrollbar */
+        @media (min-width: 769px) {
+            #modalAjukan>div {
+                max-height: none !important;
+                overflow: visible !important;
+            }
+        }
     </style>
 </head>
 
-<body>
+<body class="font-montserrat">
     {{---Navbar---}}
     @include('partials.navbar')
 
@@ -225,13 +246,13 @@
 
         {{-- Kartu panduan Ajukan kata --}}
         <div class="relative z-10 fade-up mt-12 px-4 max-w-5xl mx-auto text-center">
-            <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-6 flex items-center justify-center gap-3 animate-fade-in font-jetbrains">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-6 flex items-center justify-center gap-3 animate-fade-in">
                 <span class="text-indigo-600 animate-bounce-slow"></span>
-                Ajukan KosaKata
+                Ajukan Kosakata
             </h1>
             <p class="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed animate-fade-in-delay">
-                Fitur <span class="font-semibold text-blue-400">Ajukan KosaKata</span> memudahkan pengguna untuk membantu memperkaya kosakata bahasa melayu dari berbagai daerah,
-                Bersama <span class="font-semibold text-blue-400">Balai Bahasa Provinsi Riau</span>
+                Fitur <span class="font-semibold text-blue-400">Ajukan Kosakata</span> memudahkan pengguna untuk turut memperkaya kosakata bahasa Melayu dari berbagai daerah.
+                Bersama <span class="font-semibold text-blue-400">Balai Bahasa Provinsi Riau,</span>
                 <span class="font-semibold text-blue-400"></span>kami menjaga keakuratan bahasa daerah secara kolaboratif.
             </p>
         </div>
@@ -241,7 +262,7 @@
             class="guide-card relative z-10 bg-white/90 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl p-10 max-w-4xl w-11/12 text-center transition-all duration-300 hover:shadow-indigo-300/40">
 
             <h2 class="text-3xl font-bold text-indigo-700 mb-10 drop-shadow-sm tracking-wide">
-                Panduan Pengajuan Ajukan Kosakata
+                Panduan Pengajuan Kosakata
             </h2>
 
             {{-- Step Grid --}}
@@ -256,7 +277,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-indigo-700 text-lg mb-1">Langkah 1</h3>
-                            <p class="text-gray-700">Pilih <b>Kamus Tujuan</b> tempat Kosakata baru akan diajukan.</p>
+                            <p class="text-gray-700">Pilih <b>kamus tujuan</b> tempat Kosakata baru akan diajukan.</p>
                         </div>
                     </div>
                 </div>
@@ -271,7 +292,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-indigo-700 text-lg mb-1">Langkah 2</h3>
-                            <p class="text-gray-700">Cari <b>Kata</b> Masukkan Kosakata apa yang mau ditambahkan.</p>
+                            <p class="text-gray-700">Cari <b>Kata</b> Masukkan kosakata yang akan ditambahkan pada kolom “Kata”.</p>
                         </div>
                     </div>
                 </div>
@@ -286,7 +307,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-indigo-700 text-lg mb-1">Langkah 3</h3>
-                            <p class="text-gray-700">Isi <b>Semua Kolom</b> Berkaitan dengan kosakata yang diajukan.</p>
+                            <p class="text-gray-700">Isi <b>semua kolom</b> Berkaitan dengan kosakata yang diajukan.</p>
                         </div>
                     </div>
                 </div>
@@ -301,7 +322,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-indigo-700 text-lg mb-1">Langkah 4</h3>
-                            <p class="text-gray-700">Isi <b>identitas pengaju</b> seperti alasan dan identitas pengaju.</p>
+                            <p class="text-gray-700">Isi <b> identitas pengaju</b> dan alasan pengajuan.</p>
                         </div>
                     </div>
                 </div>
@@ -358,113 +379,184 @@
         </style>
     </section>
 
-    <!-- Modal Form Ajukan Kosakata Baru -->
+    {{-- Modal Ajukan --}}
     <div id="modalAjukan"
-        class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-all duration-300">
-        <div
-            class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl p-8 relative transform scale-90 opacity-100 transition-all duration-300 ease-out">
+        class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm
+           flex justify-center items-start
+           overflow-y-auto px-4 py-10">
 
-            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                <i class="ri-edit-2-line text-indigo-500 mr-2 text-3xl"></i>
-                📝 Formulir Pengajuan Kosakata Baru
-            </h2>
-            <hr class="mb-6 border-gray-200">
+        {{-- Card --}}
+        <div class="bg-white w-full max-w-3xl rounded-lg shadow-xl p-5 md:p-8">
 
-            <!-- Form -->
-            <form id="ajukanForm" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+            {{-- Header --}}
+            <div class="mb-6">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    📝 Formulir Pengajuan Kosakata Baru
+                </h2>
 
-                    <!-- Asal Kamus -->
-                    <div class="md:col-span-2">
-                        <label class="block font-semibold mb-1">Kamus Tujuan <span class="text-red-500">*</span></label>
-                        <select id="asal_kamus" name="asal_kamus"
-                            class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <option value="">Pilih kamus tujuan</option>
-                            @foreach($daftarAsalKamus as $kamus)
-                            <option value="{{ $kamus }}">{{ $kamus }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                {{-- Divider --}}
+                <div class="mt-3 grid grid-cols-1 md:grid-cols-2">
+                    <div class="h-px bg-gray-300 md:col-span-2 w-full"></div>
+                </div>
+            </div>
 
+            <form id="ajukanForm" class="space-y-6">
+                @csrf
 
-                    <!-- Kata -->
+                {{-- ========================= --}}
+                {{-- Kamus Tujuan --}}
+                {{-- ========================= --}}
+                <div>
+                    <label class="font-semibold block">
+                        Kamus Tujuan <span class="text-red-500">*</span>
+                    </label>
+                    <select id="asal_kamus" name="asal_kamus" required
+                        class="w-full h-[48px] px-4 pr-10 rounded-md
+                           border border-gray-200 bg-gray-50
+                           appearance-none leading-normal
+                           bg-no-repeat bg-[right_0.75rem_center] bg-[length:14px_14px]
+                           focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        style="background-image: url('{{ asset('assets/down.png') }}'); background-size: 18px 18px;">
+                        <option value="">Pilih kamus tujuan</option>
+                        @foreach ($daftarAsalKamus as $kamus)
+                        <option value="{{ $kamus }}">{{ $kamus }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- ========================= --}}
+                {{-- Kata & Suku Kata --}}
+                {{-- ========================= --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                     <div>
-                        <label class="block font-semibold mb-1">Kata <span class="text-red-500">*</span></label>
+                        <label class="font-semibold block">
+                            Kata <span class="text-red-500">*</span>
+                        </label>
                         <input type="text" id="kata" name="kata"
-                            class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                            placeholder="Masukkan kata baru...">
+                            class="w-full h-[48px] px-4 rounded-md
+                               border border-gray-200 bg-gray-50 leading-none
+                               focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="Masukkan kata...">
                     </div>
 
                     <div>
-                        <label class="block font-semibold mb-1">Suku Kata <span class="text-red-500">*</span></label>
+                        <label class="font-semibold block">
+                            Suku Kata <span class="text-red-500">*</span>
+                        </label>
                         <input type="text" id="suku_kata" name="suku_kata"
-                            class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                            placeholder="Masukkan Suku Kata...">
+                            class="w-full h-[48px] px-4 rounded-md
+                               border border-gray-200 bg-gray-50 leading-none
+                               focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="Masukkan suku kata...">
                     </div>
+                </div>
 
-                    <!-- Contoh Kalimat -->
+                {{-- ========================= --}}
+                {{-- Arti & Contoh --}}
+                {{-- ========================= --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-semibold mb-1">Contoh Kalimat (Opsional)</label>
-                        <textarea id="contoh" name="contoh" rows="2"
-                            class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                            placeholder="Tuliskan contoh penggunaan kata..."></textarea>
-                    </div>
-
-                    <!-- Arti -->
-                    <div>
-                        <label class="block font-semibold mb-1">Arti <span class="text-red-500">*</span></label>
+                        <label class="font-semibold block">
+                            Arti <span class="text-red-500">*</span>
+                        </label>
                         <textarea id="arti" name="arti" rows="2"
-                            class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            class="w-full p-3 rounded-md
+                               border border-gray-200 bg-gray-50 resize-none"
                             placeholder="Tuliskan arti kata..."></textarea>
                     </div>
 
                     <div>
-                        <label class="block font-semibold mb-1">Kelas Kata <span class="text-red-500">*</span></label>
-                        <select id="kelas_kata" name="kelas_kata"
-                            class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <option value="">Pilih kelas kata</option>
-                            <option value="n">n Nomina (Kata Benda)</option>
-                            <option value="v">v Verba (Kata Kerja)</option>
-                            <option value="adj">adj Adjektiva (Kata Sifat)</option>
-                            <option value="adv">adv Adverbia (Kata Keterangan)</option>
-                            <option value="pron">pron Pronomina (Kata Ganti)</option>
-                            <option value="num">num Numeralia (Kata Bilangan)</option>
-                            <option value="prep">prep Preposisi (Kata Depan)</option>
-                            <option value="konj">konj Konjungsi (Kata Penghubung)</option>
-                            <option value="interj">interj Interjeksi (Kata Seru)</option>
-                            <option value="part">part Partikel</option>
-                        </select>
-
-                    </div>
-
-                    <!-- Nama Pengaju -->
-                    <div>
-                        <label class="block font-semibold mb-1">Nama Pengaju <span class="text-red-500">*</span></label>
-                        <input type="text" id="asal_pengaju" name="asal_pengaju"
-                            class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                            placeholder="Nama Anda">
-                    </div>
-
-                    <!-- Email -->
-                    <div>
-                        <label class="block font-semibold mb-1">Email (Opsional)</label>
-                        <input type="email" id="email_pengaju" name="email_pengaju"
-                            class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                            placeholder="Email Anda">
+                        <label class="font-semibold block">
+                            Contoh Kalimat (Opsional)
+                        </label>
+                        <textarea id="contoh" name="contoh" rows="2"
+                            class="w-full p-3 rounded-md
+                               border border-gray-200 bg-gray-50 resize-none"
+                            placeholder="Tuliskan contoh penggunaan..."></textarea>
                     </div>
                 </div>
 
-                <!-- Alasan Pengajuan -->
+                {{-- ========================= --}}
+                {{-- Kelas Kata --}}
+                {{-- ========================= --}}
                 <div>
-                    <label class="block font-semibold mb-1">Alasan Pengajuan <span class="text-red-500">*</span></label>
-                    <textarea id="alasan_pengajuan" name="alasan_pengajuan" rows="3"
-                        class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                        placeholder="Jelaskan mengapa kosakata ini perlu ditambahkan..."></textarea>
+                    <label class="font-semibold block">
+                        Kelas Kata <span class="text-red-500">*</span>
+                    </label>
+                    <select id="kelas_kata" name="kelas_kata" required
+                        class="w-full h-[48px] px-4 pr-10 rounded-md
+                           border border-gray-200 bg-gray-50
+                           appearance-none leading-normal
+                           bg-no-repeat bg-[right_0.75rem_center] bg-[length:14px_14px]
+                           focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        style="background-image: url('{{ asset('assets/down.png') }}'); background-size: 18px 18px;">
+                        <option value="">Pilih kelas kata</option>
+                        <option value="n">Nomina</option>
+                        <option value="v">Verba</option>
+                        <option value="adj">Adjektiva</option>
+                        <option value="adv">Adverbia</option>
+                        <option value="pron">Pronomina</option>
+                        <option value="num">Numeralia</option>
+                        <option value="prep">Preposisi</option>
+                        <option value="konj">Konjungsi</option>
+                        <option value="interj">Interjeksi</option>
+                        <option value="part">Partikel</option>
+                    </select>
                 </div>
 
-                <div class="flex justify-end mt-6 gap-3">
-                    <button type="button" class="btn btn-secondary" id="btnBatalAjukan">Batal</button>
-                    <button type="submit" class="btn btn-primary">Kirim Koreksi</button>
+                {{-- ========================= --}}
+                {{-- Nama & Email --}}
+                {{-- ========================= --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="font-semibold block">
+                            Nama Pengaju <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="asal_pengaju" name="asal_pengaju" placeholder="Contoh : BBPR"
+                            class="w-full h-[48px] px-4 rounded-md
+                               border border-gray-200 bg-gray-50">
+                    </div>
+
+                    <div>
+                        <label class="font-semibold block">
+                            Email (Opsional)
+                        </label>
+                        <input type="email" id="email_pengaju" name="email_pengaju" placeholder="Contoh : balaibahasariau@gmail.com"
+                            class="w-full h-[48px] px-4 rounded-md
+                               border border-gray-200 bg-gray-50">
+                    </div>
+                </div>
+
+                {{-- ========================= --}}
+                {{-- Alasan --}}
+                {{-- ========================= --}}
+                <div>
+                    <label class="font-semibold block">
+                        Alasan Pengajuan <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="alasan_pengajuan" name="alasan_pengajuan" rows="3"
+                        class="w-full p-3 rounded-md
+                           border border-gray-200 bg-gray-50 resize-none"
+                        placeholder="Jelaskan alasan pengajuan..."></textarea>
+                </div>
+
+                {{-- Divider bawah --}}
+                <div class="mt-3 grid grid-cols-1 md:grid-cols-2">
+                    <div class="h-px bg-gray-300 md:col-span-2 w-full"></div>
+                </div>
+
+                {{-- Tombol --}}
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="btnBatalAjukan"
+                        class="btn-secondary px-5 py-2 rounded-md bg-gray-200 hover:bg-gray-300 font-medium">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2 h-[50px] rounded-md
+                           bg-indigo-600 text-white font-semibold
+                           hover:bg-indigo-700 transition">
+                        Kirim Pengajuan
+                    </button>
                 </div>
 
             </form>
@@ -563,7 +655,7 @@
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil',
-                        text: 'Pengajuan kosakata baru berhasil dikirim!',
+                        text: 'Pengajuan Kosakata baru berhasil dikirim!',
                         confirmButtonColor: '#6366f1'
                     }).then(() => {
                         // Reset form

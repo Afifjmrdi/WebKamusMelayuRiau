@@ -8,6 +8,10 @@ use Illuminate\Support\Str;
 use App\Models\Kata;
 use App\Models\Visitor;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Imports\KamusImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +23,7 @@ class KamusController extends Controller
     {
         // Kosakata hari ini
         $kosakataHariIni = Cache::remember('kosakata_menarik_' . date('Y-m-d'), 86400, function () {
-            return \App\Models\Kata::inRandomOrder()->limit(16)->get();
+            return \App\Models\Kata::inRandomOrder()->limit(30)->get();
         });
 
         $trending = Cache::remember('trending_kata_10', 300, function () {
@@ -29,6 +33,19 @@ class KamusController extends Controller
         $daftarAsalKamus = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus')->toArray();
 
         return view('home', compact('kosakataHariIni', 'daftarAsalKamus', 'trending'));
+    }
+
+    public function kosakataMenarik()
+    {
+        $kosakataHariIni = Cache::remember(
+            'kosakata_menarik_' . date('Y-m-d'),
+            86400,
+            function () {
+                return Kamus::inRandomOrder()->limit(16)->get();
+            }
+        );
+
+        return view('kosakatamenarik', compact('kosakataHariIni'));
     }
 
     public function search(Request $request)
@@ -159,22 +176,22 @@ class KamusController extends Controller
     }
 
 
-    public function trackSearch(Request $request)
-    {
-        $id = (int) $request->input('id', 0);
-        if ($id <= 0) {
-            return response()->json(['success' => false, 'message' => 'Invalid id'], 400);
-        }
+    // public function trackSearch(Request $request)
+    // {
+    //     $id = (int) $request->input('id', 0);
+    //     if ($id <= 0) {
+    //         return response()->json(['success' => false, 'message' => 'Invalid id'], 400);
+    //     }
 
-        try {
-            // race-safe increment
-            Kamus::where('id', $id)->increment('search_count');
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            Log::error('trackSearch error: ' . $e->getMessage());
-            return response()->json(['success' => false], 500);
-        }
-    }
+    //     try {
+    //         // race-safe increment
+    //         Kamus::where('id', $id)->increment('search_count');
+    //         return response()->json(['success' => true]);
+    //     } catch (\Exception $e) {
+    //         Log::error('trackSearch error: ' . $e->getMessage());
+    //         return response()->json(['success' => false], 500);
+    //     }
+    // }
 
     /** (optional) return JSON detail untuk id tertentu */
     public function detailJson($id)
@@ -193,12 +210,6 @@ class KamusController extends Controller
         if (!session('admin_id')) {
             return redirect()->route('admin.login');
         }
-
-        // // Hitung berdasarkan nama kamus (kalau masih diperlukan)
-        // $kuansingCount = Kamus::where('asal_kamus', 'Kamus Indonesia - Kuantan Singingi')->count();
-        // $siakCount     = Kamus::where('asal_kamus', 'Kamus Indonesia - Melayu Siak')->count();
-        // $rohilCount    = Kamus::where('asal_kamus', 'Kamus Indonesia - Rokan Hilir')->count();
-        // $inhilCount    = Kamus::where('asal_kamus', 'Kamus Indonesia - Indragiri Hulu')->count();
 
         // ✅ daftar kamus dinamis dari database
         $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
@@ -392,5 +403,84 @@ class KamusController extends Controller
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function downloadTemplateImport()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Import Kamus');
+
+        // Header
+        $headers = [
+            'kata',
+            'kelas_kata',
+            'arti',
+            'contoh',
+            'asal_kamus',
+            'suku_kata'
+        ];
+
+        $sheet->fromArray($headers, null, 'A1');
+
+        // Styling header (Excel green)
+        $sheet->getStyle('A1:F1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF']
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '217346'] // Excel Green
+            ],
+        ]);
+
+        // Auto width
+        foreach (range('A', 'F') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Contoh data
+        $sheet->fromArray([
+            'mengelala',
+            'v',
+            'mencari sesuatu setengah mati karena lupa menyimpan barang',
+            'Ia mengelala dompetnya sejak pagi',
+            'Kamus Indonesia - Melayu Siak',
+            'me.nge.la.la'
+        ], null, 'A2');
+
+        // Freeze header
+        $sheet->freezePane('A2');
+
+        $writer = new Xlsx($spreadsheet);
+
+        return new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output');
+        }, 200, [
+            "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Content-Disposition" => "attachment; filename=template_import_kamus.xlsx",
+        ]);
+    }
+
+    public function previewImport(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        $file = $request->file('file');
+
+        // Ambil data mentah Excel
+        $rows = Excel::toArray(new KamusImport, $file)[0];
+
+        // Jalankan validasi tanpa simpan
+        $import = new KamusImport;
+        Excel::import($import, $file);
+
+        return view('admin.datakamus.import-preview', [
+            'rows'     => $rows,
+            'failures' => $import->failures()
+        ]);
     }
 }

@@ -9,7 +9,7 @@
                     <span class="font-semibold text-gray-800 text-sm sm:text-base">Balai Bahasa Provinsi Riau</span>
                 </div>
                 <p class="text-gray-500 text-[12px] sm:text-[13px] leading-snug">
-                    Sistem ini memiliki beragam kamus yang berasal dari berbagai daerah di provinsi Riau.
+                    Sistem ini memiliki beragam kamus yang berasal dari berbagai daerah di Provinsi Riau.
                 </p>
                 <div class="flex items-center gap-3 pt-1">
                     <a href="#"><img src="{{ asset('assets/facebook.png') }}" class="h-5 w-5"></a>
@@ -26,6 +26,12 @@
                     <li><a href="{{ url('/koreksi') }}" class="hover:text-blue-600 transition">Koreksi Kosakata</a></li>
                     <li><a href="{{ url('/ajukan') }}" class="hover:text-blue-600 transition">Ajukan Kosakata</a></li>
                     <li><a href="{{ url('/tentang') }}" class="hover:text-blue-600 transition">Tentang Kami</a></li>
+                    <li>
+                        <a href="{{ route('kamus.istilah') }}"
+                            class=" hover:text-blue-600 transition">
+                            Kamus Istilah
+                        </a>
+                    </li>
                 </ul>
             </div>
 
@@ -33,11 +39,11 @@
             <div>
                 <h3 class="font-semibold text-gray-800 mb-2 text-sm">Alamat</h3>
                 <p class="text-gray-500 text-[12px] sm:text-[13px] leading-snug">
-                    Badan Pengembangan dan Pembinaan Bahasa<br>
-                    Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi
+                    Pengembangan dan Pembinaan Bahasa<br>
+                    Kementerian Pendidikan Dasar dan Menengah, Kebudayaan, Riset, dan Teknologi
                 </p>
                 <p class="text-gray-500 text-[12px] sm:text-[13px] mt-2 leading-snug">
-                    Jalan Binawidya, Kompleks Universitas Riau,<br>
+                    Balai Bahasa Provinsi Riau Jalan Binawidya, Kompleks Universitas Riau,<br>
                     Panam, Kota Pekanbaru, Riau 28292
                 </p>
             </div>
@@ -54,7 +60,7 @@
 
         <!-- Garis dan Hak Cipta -->
         <div class="border-t border-gray-200 mt-6 pt-4 flex flex-col md:flex-row justify-between items-center text-[11px] sm:text-[12px] text-gray-400 text-center gap-1">
-            <p>© 2025 Balai Bahasa Provinsi Riau. All rights reserved.</p>
+            <p>© 2025 Balai Bahasa Provinsi Riau, Kementerian Pendidikan Dasar dan Menengah.</p>
 
             <div>
                 Icons by <a href="https://www.flaticon.com/" target="_blank" class="underline hover:text-blue-500">Freepik - Flaticon</a> |

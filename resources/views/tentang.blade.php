@@ -8,6 +8,7 @@
     @vite(['resources/css/app.css'])
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="//unpkg.com/alpinejs" defer></script>
 
     <style>
@@ -20,6 +21,10 @@
 
         .font-jetbrains {
             font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
         }
 
         .kampus-logo {
@@ -226,14 +231,14 @@
 
         {{-- Konten Utama --}}
         <div class="relative z-10 fade-up mt-12 px-4 max-w-5xl mx-auto">
-            <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-6 font-jetbrains">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-6">
                 Tentang Kami
             </h1>
             <p class="text-gray-600 text-lg max-w-3xl mx-auto mb-12">
                 <span class="font-semibold text-blue-400">Kamus Balai Bahasa Riau</span> merupakan hasil kolaborasi antara
                 <span class="font-semibold text-blue-400">Balai Bahasa Provinsi Riau</span> dan
                 <span class="font-semibold text-blue-400">Politeknik Caltex Riau</span>.
-                Kami berkomitmen menghadirkan kamus digital yang interaktif dan mudah diakses untuk menjaga kelestarian bahasa daerah Riau.
+                Kami berkomitmen menghadirkan kamus digital yang interaktif dan mudah diakses untuk menjaga kelestarian bahasa Melayu Riau.
             </p>
         </div>
         {{-- Collaboration Card --}}
@@ -245,13 +250,16 @@
                     <h2 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-3">
                         Kolaborasi dengan Politeknik Caltex Riau
                     </h2>
-                    <p class="text-gray-700 leading-relaxed mb-3">
+
+                    <p class="text-gray-700 leading-relaxed mb-3 text-justify hyphens-auto">
                         Proyek ini dikembangkan melalui program magang mahasiswa Politeknik Caltex Riau (PCR) bersama
                         Balai Bahasa Provinsi Riau.
                     </p>
-                    <p class="text-gray-700 leading-relaxed">
-                        Mulai dari perancangan antarmuka, sistem pencarian, hingga seluruh implementasi teknis dilakukan oleh
-                        mahasiswa magang dengan bimbingan dari Balai Bahasa.
+
+                    <p class="text-gray-700 leading-relaxed text-justify hyphens-auto">
+                        Mulai dari perancangan antarmuka, sistem pencarian, hingga seluruh implementasi teknis
+                        dikerjakan oleh mahasiswa magang Politeknik Caltex Riau dengan bimbingan Tim Kamus dan
+                        Peristilahan dari Balai Bahasa Provinsi Riau.
                     </p>
                 </div>
 
@@ -265,7 +273,7 @@
                 Mari Bersama Melestarikan Bahasa Daerah
             </h3>
             <p class="text-gray-500 mb-8 max-w-2xl mx-auto">
-                Setiap kata adalah warisan budaya. Jadilah bagian dari perjalanan menjaga bahasa Riau agar terus hidup dan berkembang.
+                Setiap kata adalah warisan budaya. Jadilah bagian dari perjalanan menjaga bahasa Melayu Riau agar terus hidup dan berkembang.
             </p>
             <a href="{{ url('/') }}"
                 class="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full font-semibold transition">

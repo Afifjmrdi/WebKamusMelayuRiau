@@ -10,6 +10,8 @@ use App\Http\Controllers\KataController;
 use App\Http\Controllers\KoreksiController;
 use App\Http\Controllers\AjukanKosakataController;
 use App\Http\Middleware\AdminAuth;
+use App\Http\Controllers\KamusIstilahController;
+use App\Http\Controllers\KamusIstilahAdminController;
 use App\Http\Middleware\RecordVisitor;
 use App\Models\Admin;
 
@@ -18,16 +20,26 @@ use App\Models\Admin;
 # =========================
 Route::middleware([RecordVisitor::class])->group(function () {
 
-    // Halaman utama
-    Route::get('/', [KamusController::class, 'index'])->name('home');
+    // SPLASH SCREEN (HALAMAN AWAL)
+    Route::get('/', function () {
+        return view('splash');
+    })->name('splash');
+
+    // HALAMAN UTAMA
+    Route::get('/home', [KamusController::class, 'index'])->name('home');
 
     // Search & detail
     Route::post('/track-search', [KamusController::class, 'trackSearch'])->name('track.search');
     Route::get('/kamus/{id}', [KamusController::class, 'detailJson'])->name('kamus.detail.json');
     Route::get('/search', [KamusController::class, 'search'])->name('search');
+    Route::get('/kosakata-menarik', [KamusController::class, 'kosakataMenarik']);
 
     // Halaman tentang
     Route::get('/tentang', fn() => view('tentang'))->name('tentang');
+
+    // Kamus Istilah   
+    Route::get('/kamus-istilah', [KamusIstilahController::class, 'index'])->name('kamus.istilah');
+    Route::get('/search-istilah', [KamusIstilahController::class, 'search']);
 
     # =========================
     #  AJUKAN & KOREKSI USER
@@ -40,7 +52,6 @@ Route::middleware([RecordVisitor::class])->group(function () {
     Route::get('/koreksi/search', [KoreksiController::class, 'search'])->name('koreksi.search');
     Route::get('/koreksi/detail/{asal_kamus}/{kata}', [KoreksiController::class, 'detail'])->name('koreksi.detail');
 });
-
 
 # =========================
 #  LOGIN ADMIN (TANPA MIDDLEWARE)
@@ -79,6 +90,17 @@ Route::middleware([AdminAuth::class])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/profile', [AdminAuthController::class, 'profile'])->name('admin.profile');
 
+    # Manajemen Admin Kamus Istilah
+    Route::get('/kamus-istilah', [KamusIstilahAdminController::class, 'index'])->name('admin.kamus-istilah.dataistilah');
+    Route::post('/admin/kamus-istilah/bulk-delete',[KamusIstilahAdminController::class, 'bulkDelete'])->name('admin.kamus-istilah.bulk-delete');
+    Route::get('/kamus-istilah/{id}', [KamusIstilahAdminController::class, 'show'])->name('admin.kamus-istilah.show');
+    Route::post('/admin/kamus-istilah/store',[KamusIstilahAdminController::class, 'store'])->name('admin.kamus-istilah.store');
+    Route::post('/admin/kamus-istilah/import',[KamusIstilahAdminController::class, 'import'])->name('admin.kamus-istilah.import');
+    Route::put('/kamus-istilah/{id}', [KamusIstilahAdminController::class, 'update'])->name('admin.kamus-istilah.update');
+    Route::delete('/kamus-istilah/{id}', [KamusIstilahAdminController::class, 'destroy'])->name('admin.kamus-istilah.destroy');
+    Route::get('/admin/kamus-istilah/template',[KamusIstilahAdminController::class, 'downloadTemplate'])->name('admin.kamus-istilah.template');
+
+
     # Pelayanan
     Route::get('/pelayanan/pengajuan', [DashboardController::class, 'pengajuan'])->name('admin.pelayanan.pengajuan');
     Route::get('/pelayanan/koreksikata', [KoreksiController::class, 'adminIndex'])->name('admin.pelayanan.koreksikata');
@@ -95,6 +117,7 @@ Route::middleware([AdminAuth::class])->prefix('admin')->group(function () {
     # Koreksi di area admin
     Route::post('/koreksi/{id}/approve', [KoreksiController::class, 'approve'])->name('admin.koreksi.approve');
     Route::delete('/koreksi/{id}/hapus', [KoreksiController::class, 'deletePermanent'])->name('admin.koreksi.delete');
+    Route::post('/koreksi/{id}/reject', [KoreksiController::class, 'reject'])->name('admin.koreksi.reject');
 
     # Kamus CRUD
     Route::post('/admin/kamus/bulk-destroy', [KamusController::class, 'bulkDestroy'])->name('admin.kamus.bulkDestroy');
@@ -106,6 +129,8 @@ Route::middleware([AdminAuth::class])->prefix('admin')->group(function () {
     Route::put('/kamus/{id}', [KamusController::class, 'update'])->name('admin.update');
     Route::delete('/kamus/{id}', [KamusController::class, 'destroy'])->name('admin.destroy');
     Route::post('/admin/kamus/import', [KamusController::class, 'import'])->name('admin.kamus.import');
+    Route::get('/admin/kamus/template-import',[KamusController::class, 'downloadTemplateImport'])->name('admin.kamus.template');
+    Route::post('/admin/kamus/import/preview', [KamusController::class, 'previewImport'])->name('admin.kamus.import.preview');
 });
 
 

@@ -127,6 +127,12 @@
                 <li><a href="{{ url('/koreksi') }}" class="menu-item {{ request()->is('koreksi') ? 'active' : '' }}">KOREKSI</a></li>
                 <li><a href="{{ url('/ajukan') }}" class="menu-item {{ request()->is('ajukan') ? 'active' : '' }}">AJUKAN</a></li>
                 <li><a href="{{ url('/tentang') }}" class="menu-item {{ request()->is('tentang') ? 'active' : '' }}">TENTANG</a></li>
+                <li>
+                    <a href="{{ route('kamus.istilah') }}"
+                        class="menu-item {{ request()->routeIs('kamus.istilah') ? 'active' : '' }}">
+                        KAMUS ISTILAH
+                    </a>
+                </li>
 
             </ul>
         </div>
@@ -170,6 +176,7 @@
         ['url' => '/koreksi', 'label' => 'Koreksi Kata', 'icon' => ''],
         ['url' => '/ajukan', 'label' => 'Ajukan Kata', 'icon' => ''],
         ['url' => '/tentang', 'label' => 'Tentang Kami', 'icon' => ''],
+        ['url' => '/kamusistilah', 'label' => 'Kamus Istilah', 'icon' => ''],
         ];
         @endphp
 

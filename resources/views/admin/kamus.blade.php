@@ -89,6 +89,94 @@
         overflow-x: auto;
     }
 </style>
+
+<style>
+    /* Perapian tampilan modal form */
+    #createModal .modal-body {
+        padding: 1.5rem 2rem !important;
+        background-color: #fdfdfd;
+    }
+
+    #createModal form label {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        display: block;
+        color: #374151;
+        font-size: 0.9rem;
+    }
+
+    #createModal form input,
+    #createModal form select,
+    #createModal form textarea {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 0.2rem;
+        padding: 0.55rem 0.75rem;
+        background-color: #f9fafb;
+        font-size: 0.9rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+    #createModal form input:focus,
+    #createModal form select:focus,
+    #createModal form textarea:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+        background-color: #fff;
+        outline: none;
+    }
+
+    /* Grid form dua kolom lebih rapat */
+    #createModal .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.6rem;
+    }
+
+    /* Tombol bawah form */
+    #createModal .modal-footer-btns {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    #createModal button {
+        font-weight: 500;
+        border: none;
+        font-size: 0.9rem;
+    }
+
+    #createModal .btn-cancel {
+        background: #e5e7eb;
+        color: #374151;
+        padding: 0.5rem 1rem;
+        border-radius: 0.2rem;
+    }
+
+    #createModal .btn-cancel:hover {
+        background: #d1d5db;
+    }
+
+    #createModal .btn-save {
+        background: #4f46e5;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.2rem;
+    }
+
+    #createModal .btn-save:hover {
+        background: #4338ca;
+    }
+
+    /* Modal tetap sejajar rapi */
+    .modal-dialog-centered {
+        display: flex;
+        align-items: center;
+        min-height: calc(100% - 1rem);
+    }
+</style>
+
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="mx-n4">
@@ -110,93 +198,6 @@
 
             {{-- 📄 Pagination --}}
             @include('admin.pagination')
-            <style>
-                /* Perapian tampilan modal form */
-                #createModal .modal-body {
-                    padding: 1.5rem 2rem !important;
-                    background-color: #fdfdfd;
-                }
-
-                #createModal form label {
-                    font-weight: 600;
-                    margin-bottom: 0.25rem;
-                    display: block;
-                    color: #374151;
-                    font-size: 0.9rem;
-                }
-
-                #createModal form input,
-                #createModal form select,
-                #createModal form textarea {
-                    width: 100%;
-                    border: 1px solid #d1d5db;
-                    border-radius: 0.2rem;
-                    padding: 0.55rem 0.75rem;
-                    background-color: #f9fafb;
-                    font-size: 0.9rem;
-                    transition: all 0.2s ease-in-out;
-                }
-
-                #createModal form input:focus,
-                #createModal form select:focus,
-                #createModal form textarea:focus {
-                    border-color: #6366f1;
-                    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
-                    background-color: #fff;
-                    outline: none;
-                }
-
-                /* Grid form dua kolom lebih rapat */
-                #createModal .grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                    gap: 0.6rem;
-                }
-
-                /* Tombol bawah form */
-                #createModal .modal-footer-btns {
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: 0.5rem;
-                    margin-top: 1rem;
-                }
-
-                #createModal button {
-                    font-weight: 500;
-                    border: none;
-                    font-size: 0.9rem;
-                }
-
-                #createModal .btn-cancel {
-                    background: #e5e7eb;
-                    color: #374151;
-                    padding: 0.5rem 1rem;
-                    border-radius: 0.2rem;
-                }
-
-                #createModal .btn-cancel:hover {
-                    background: #d1d5db;
-                }
-
-                #createModal .btn-save {
-                    background: #4f46e5;
-                    color: white;
-                    padding: 0.5rem 1rem;
-                    border-radius: 0.2rem;
-                }
-
-                #createModal .btn-save:hover {
-                    background: #4338ca;
-                }
-
-                /* Modal tetap sejajar rapi */
-                .modal-dialog-centered {
-                    display: flex;
-                    align-items: center;
-                    min-height: calc(100% - 1rem);
-                }
-            </style>
-
 
             {{-- 🆕 Modal Tambah Data Kamus --}}
             <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
@@ -296,7 +297,6 @@
             <!-- End Modal Create -->
         </div>
     </div>
-</div>
 </div>
 
 @endsection

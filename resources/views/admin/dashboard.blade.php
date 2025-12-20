@@ -8,12 +8,68 @@
 <div class="position-relative mb-4">
     <div class="card border-0 shadow-lg rounded-4 overflow-hidden text-white"
         style="background: url('{{ asset('assets/dashboard1.png') }}') no-repeat center/cover; min-height: 170px;">
-        <div class="p-5">
-            <h1 class="fw-bold text-white">Halo {{ $admin->name ?? 'Admin' }}!</h1>
-            <p class="fs-5 opacity-75">Selamat Datang, mohon cek update pengajuan selalu ya.</p>
+
+        <div class="p-4 d-flex justify-content-between align-items-center flex-wrap gap-4">
+
+            {{-- LEFT : GREETING --}}
+            <div>
+                <h1 class="fw-bold text-white mb-2">
+                    Halo {{ $admin->name ?? 'Admin' }}!
+                </h1>
+                <h5 class="fs-5 opacity-75 mb-0 text-white mt-4">
+                    Selamat Datang,
+                    <h5 class="text-white pt-2">mohon cek update pengajuan selalu ya.</h5>
+                </h5>
+            </div>
+
+            {{-- RIGHT : STAT BOX --}}
+            <div class="d-flex flex-wrap gap-3">
+
+                {{-- KOREKSI DITERIMA --}}
+                <div class="bg-dark bg-opacity-75 rounded-3 px-2 py-3 text-center text-white shadow-sm"
+                    style="min-width:140px">
+                    <div class="small fw-semibold">Total Pengunjung Kamus</div>
+                    <div class="fs-4 fw-bold">{{ $totalVisitors }}</div>
+                    <div class="small opacity-75">Pengunjung</div>
+                </div>
+
+                {{-- KOREKSI DITERIMA --}}
+                <div class="bg-dark bg-opacity-75 rounded-3 px-2 py-3 text-center text-white shadow-sm"
+                    style="min-width:140px">
+                    <div class="small fw-semibold">Pengajuan Koreksi</div>
+                    <div class="fs-4 fw-bold">{{ $koreksiDiterima }}</div>
+                    <div class="small opacity-75">Diterima</div>
+                </div>
+
+                {{-- KOREKSI DITOLAK --}}
+                <div class="bg-dark bg-opacity-75 rounded-3 px-2 py-3 text-center text-white shadow-sm"
+                    style="min-width:140px">
+                    <div class="small fw-semibold">Pengajuan Koreksi</div>
+                    <div class="fs-4 fw-bold">{{ $koreksiDitolak }}</div>
+                    <div class="small opacity-75">Ditolak</div>
+                </div>
+
+                {{-- AJUKAN DITERIMA --}}
+                <div class="bg-white bg-opacity-75 rounded-3 px-2 py-3 text-center text-dark shadow-sm"
+                    style="min-width:140px">
+                    <div class="small fw-semibold">Pengajuan Kosakata</div>
+                    <div class="fs-4 fw-bold">{{ $ajukanDiterima }}</div>
+                    <div class="small opacity-75">Diterima</div>
+                </div>
+
+                {{-- AJUKAN DITOLAK --}}
+                <div class="bg-white bg-opacity-75 rounded-3 px-2 py-3 text-center shadow-sm text-dark"
+                    style="min-width:140px">
+                    <div class="small fw-semibold">Pengajuan Kosakata</div>
+                    <div class="fs-4 fw-bold">{{ $ajukanDitolak }}</div>
+                    <div class="small opacity-75">Ditolak</div>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
+
 
 {{-- STATISTICS --}}
 <div class="row g-4 mb-4">
@@ -38,8 +94,8 @@
         <div class="card shadow-sm rounded-4 border-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="text-muted">Total Pengunjung Kamus</h6>
-                    <h3 class="fw-bold">{{ $totalVisitors }}</h3>
+                    <h6 class="text-muted">Total Istilah</h6>
+                    <h3 class="fw-bold">{{ $totalIstilah }}</h3>
                 </div>
                 <div class="icon-box rounded-4 bg-dark text-white p-3">
                     <i class="bx bx-globe fs-2"></i>
@@ -137,6 +193,38 @@
         </div>
     </div>
 </div>
+
+<!-- <div class="row mt-4">
+    {{-- BAR CHART --}}
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0">
+                <h6 class="fw-bold mb-0">
+                    <i class="bx bx-bar-chart-alt-2 text-primary me-1"></i>
+                    Statistik Istilah per Kelas Kata
+                </h6>
+            </div>
+            <div class="card-body">
+                <canvas id="kelasKataBarChart" height="110"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {{-- DOUGHNUT --}}
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0">
+                <h6 class="fw-bold mb-0">
+                    <i class="bx bx-pie-chart-alt text-success me-1"></i>
+                    Proporsi Istilah
+                </h6>
+            </div>
+            <div class="card-body">
+                <canvas id="kelasKataDonutChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div> -->
 
 {{-- BAR CHART PER KAMUS — GABUNG --}}
 <div class="row mt-4">
@@ -265,6 +353,65 @@
                 enabled: true
             }
         }).render();
+    });
+</script>
+
+<script>
+    const kelasLabels = @json($kelasLabels);
+    const kelasTotals = @json($kelasTotals);
+
+    const colors = [
+        '#2563eb', '#16a34a', '#f59e0b', '#dc2626',
+        '#7c3aed', '#0891b2', '#db2777', '#4b5563'
+    ];
+
+    // ================= BAR CHART =================
+    new Chart(document.getElementById('kelasKataBarChart'), {
+        type: 'bar',
+        data: {
+            labels: kelasLabels,
+            datasets: [{
+                label: 'Jumlah Istilah',
+                data: kelasTotals,
+                backgroundColor: colors,
+                borderRadius: 8,
+                barThickness: 38
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // ================= DOUGHNUT =================
+    new Chart(document.getElementById('kelasKataDonutChart'), {
+        type: 'doughnut',
+        data: {
+            labels: kelasLabels,
+            datasets: [{
+                data: kelasTotals,
+                backgroundColor: colors,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
     });
 </script>
 
