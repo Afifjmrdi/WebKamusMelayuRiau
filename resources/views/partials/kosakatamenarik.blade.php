@@ -21,7 +21,7 @@
             Kosakata Menarik Hari Ini
         </h2>
         <p class="text-gray-600 text-sm md:text-base">
-            Temukan kata-kata pilihan penuh makna dari <span class="font-semibold text-blue-500">berbagai macam kamus daerah</span>
+            Temukan kosakata pilihan penuh makna dari <span class="font-semibold text-blue-500">berbagai bahasa Melayu Riau</span>
         </p>
     </div>
 

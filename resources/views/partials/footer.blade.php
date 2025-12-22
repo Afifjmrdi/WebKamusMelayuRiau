@@ -5,7 +5,7 @@
             <!-- Kolom 1 -->
             <div class="space-y-3">
                 <div class="flex items-center gap-2">
-                    <img src="{{ asset('assets/BBP.png') }}" alt="Logo" class="h-7">
+                    <img src="{{ asset('assets/logobbpr4.png') }}" alt="Logo" class="h-2">
                     <span class="font-semibold text-gray-800 text-sm sm:text-base">Balai Bahasa Provinsi Riau</span>
                 </div>
                 <p class="text-gray-500 text-[12px] sm:text-[13px] leading-snug">
@@ -43,10 +43,6 @@
             <!-- Kolom 3 -->
             <div>
                 <h3 class="font-semibold text-gray-800 mb-2 text-sm">Alamat</h3>
-                <p class="text-gray-500 text-[12px] sm:text-[13px] leading-snug">
-                    Pengembangan dan Pembinaan Bahasa<br>
-                    Kementerian Pendidikan Dasar dan Menengah, Kebudayaan, Riset, dan Teknologi
-                </p>
                 <p class="text-gray-500 text-[12px] sm:text-[13px] mt-2 leading-snug">
                     Balai Bahasa Provinsi Riau Jalan Binawidya, Kompleks Universitas Riau,<br>
                     Panam, Kota Pekanbaru, Riau 28292

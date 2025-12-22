@@ -28,8 +28,8 @@
     <div class="relative w-full max-w-md bg-white/40 backdrop-blur-lg border border-white/30 rounded-2xl shadow-xl p-8 z-10">
         <!-- Logo -->
         <div class="flex justify-center mb-6">
-            <div class="w-32 h-32 rounded-full bg-white/60 backdrop-blur-md shadow-lg flex items-center justify-center">
-                <img src="{{ asset('assets/logo_bbp.png') }}" alt="Logo" class="w-24 h-24 object-contain mt-4">
+            <div class="w-37 h-37 rounded-full bg-white/60 backdrop-blur-md shadow-lg flex items-center justify-center">
+                <img src="{{ asset('assets/logobbpr.png') }}" alt="Logo" class="w-33 h-33 object-contain mt-4">
             </div>
         </div>
 

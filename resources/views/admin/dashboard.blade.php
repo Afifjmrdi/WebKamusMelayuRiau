@@ -4,6 +4,36 @@
 
 @section('content')
 
+<style>
+    .donut-wrap {
+        width: 170px;
+        height: 170px;
+        position: relative;
+    }
+
+    #donutChart {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .donut-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+
+    .donut-wrap:hover .donut-center {
+        opacity: 0;
+    }
+
+    .donut-center h4 {
+        font-size: 1.6rem;
+        line-height: 1.2;
+    }
+</style>
+
 {{-- HERO --}}
 <div class="position-relative mb-4">
     <div class="card border-0 shadow-lg rounded-4 overflow-hidden text-white"
@@ -138,53 +168,6 @@
 
 {{-- DONUT + LINE CHART --}}
 <div class="row g-4">
-    <div class="col-md-4">
-        <div class="card shadow-sm border-0 rounded-4 p-4">
-
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <h5 class="fw-bold" style="margin-top: 15px;">Statistik Kamus</h5>
-                    <p class="text-muted medium">{{ array_sum($chartCounts) }} Kosakata</p>
-                </div>
-
-                <div id="donutWrapper"
-                    style="
-                    padding: 10px;
-                    background: #fff;
-                    border-radius: 50%;
-                    width: 160px;
-                    height: 160px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                ">
-                    <div id="donutChart" style="width:100%; height:100%;"></div>
-                </div>
-            </div>
-
-            <h2 class="fw-bold mt-2">{{ array_sum($chartCounts) }}</h2>
-            <p class="text-muted medium">Total Kosakata</p>
-
-            <div class="mt-3">
-                @foreach ($chartNames as $i => $name)
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="p-2 rounded-3" style="background:#eef2ff;">
-                            <i class="bx bx-book fs-4 text-primary"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-0 fw-semibold">{{ $name }}</h6>
-                            <small class="text-muted">Jumlah kosakata</small>
-                        </div>
-                    </div>
-                    <span class="fw-bold">{{ $chartCounts[$i] }}</span>
-                </div>
-                @endforeach
-            </div>
-
-        </div>
-    </div>
-
     {{-- LINE CHART --}}
     <div class="col-md-8">
         <div class="card shadow-sm border-0 rounded-4 p-4">
@@ -192,39 +175,70 @@
             <div id="chartKosakata" style="height: 350px;"></div>
         </div>
     </div>
-</div>
 
-<!-- <div class="row mt-4">
-    {{-- BAR CHART --}}
-    <div class="col-md-8">
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-white border-0">
-                <h6 class="fw-bold mb-0">
-                    <i class="bx bx-bar-chart-alt-2 text-primary me-1"></i>
-                    Statistik Istilah per Kelas Kata
-                </h6>
-            </div>
-            <div class="card-body">
-                <canvas id="kelasKataBarChart" height="110"></canvas>
-            </div>
-        </div>
-    </div>
-
-    {{-- DOUGHNUT --}}
+    {{-- DONUT CHART --}}
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-white border-0">
-                <h6 class="fw-bold mb-0">
-                    <i class="bx bx-pie-chart-alt text-success me-1"></i>
-                    Proporsi Istilah
-                </h6>
+        <div class="card shadow-sm border-0 rounded-4 p-4 h-100">
+
+            {{-- HEADER --}}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h6 class="fw-bold mb-1 text-uppercase text-muted">
+                        Statistik Kamus
+                    </h6>
+                    <small class="text-muted">
+                        Total {{ array_sum($chartCounts) }} Kosakata
+                    </small>
+                </div>
             </div>
-            <div class="card-body">
-                <canvas id="kelasKataDonutChart"></canvas>
+
+            {{-- DONUT + TOTAL --}}
+            <div class="d-flex justify-content-center my-3">
+                <div class="position-relative donut-wrap">
+
+                    <canvas id="donutChart" width="170" height="170"></canvas>
+
+                    {{-- CENTER TEXT (CUSTOM) --}}
+                    <div class="donut-center text-center">
+                        <h4 class="fw-bold mb-0">
+                            {{ array_sum($chartCounts) }}
+                        </h4>
+                        <small class="text-muted">Kosakata</small>
+                    </div>
+
+                </div>
             </div>
+
+            <hr class="my-4">
+
+            {{-- LIST STATISTIK --}}
+            <div class="d-flex flex-column gap-3">
+                @foreach ($chartNames as $i => $name)
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center"
+                            style="width:42px;height:42px;background:#eef2ff;">
+                            <i class="bx bx-book fs-5 text-primary"></i>
+                        </div>
+
+                        <div>
+                            <div class="fw-semibold">{{ $name }}</div>
+                            <small class="text-muted">Jumlah kosakata</small>
+                        </div>
+                    </div>
+
+                    <span class="fw-bold fs-6">
+                        {{ $chartCounts[$i] }}
+                    </span>
+                </div>
+                @endforeach
+            </div>
+
         </div>
     </div>
-</div> -->
+
+</div>
 
 {{-- BAR CHART PER KAMUS — GABUNG --}}
 <div class="row mt-4">
@@ -244,45 +258,80 @@
 {{-- DONUT CHART --}}
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var donutChart = new ApexCharts(document.querySelector("#donutChart"), {
-            chart: {
-                type: 'donut',
-                height: 180,
+    window.addEventListener("load", function() {
+
+        const ctx = document.getElementById("donutChart");
+        if (!ctx) return;
+
+        new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: @json($chartNames),
+                datasets: [{
+                    data: @json($chartCounts),
+                    backgroundColor: [
+                        "#6366F1",
+                        "#22C55E",
+                        "#EC4899",
+                        "#F59E0B",
+                        "#06B6D4",
+                        "#8B5CF6"
+                    ],
+                    borderWidth: 4,
+                    borderColor: "#ffffff",
+                    hoverOffset: 8
+                }]
             },
-            series: @json($chartCounts),
-            labels: @json($chartNames),
-            colors: ['#696cff', '#ff0084ff', '#56ca00', '#ffab00'],
-            stroke: {
-                width: 4,
-                colors: ['#fff']
-            },
-            dataLabels: {
-                enabled: false
-            },
-            legend: {
-                show: false
-            },
-            plotOptions: {
-                pie: {
-                    donut: {
-                        size: '75%',
-                        labels: {
-                            show: true,
-                            total: {
-                                show: true,
-                                label: 'Total',
-                                formatter: () => "{{ array_sum($chartCounts) }}"
+            options: {
+                responsive: true,
+                cutout: "70%",
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: "#111827",
+                        padding: 12,
+                        titleFont: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            size: 12
+                        },
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const label = tooltipItems[0].label;
+
+                                // 🔥 PECAH JADI DUA BARIS
+                                if (label.includes("Indonesia-Melayu")) {
+                                    return [
+                                        "Kamus Indonesia-",
+                                        label.replace("Kamus Indonesia-Melayu ", "Melayu ")
+                                    ];
+                                }
+
+                                return label;
+                            },
+                            label: function(context) {
+                                return "Jumlah: " + context.raw.toLocaleString("id-ID") + " kosakata";
                             }
                         }
                     }
+
+                },
+                animation: {
+                    animateRotate: true,
+                    duration: 900,
+                    easing: "easeOutQuart"
                 }
             }
         });
 
-        donutChart.render();
     });
 </script>
+
 
 {{-- LINE CHART --}}
 <script>
@@ -355,65 +404,4 @@
         }).render();
     });
 </script>
-
-<script>
-    const kelasLabels = @json($kelasLabels);
-    const kelasTotals = @json($kelasTotals);
-
-    const colors = [
-        '#2563eb', '#16a34a', '#f59e0b', '#dc2626',
-        '#7c3aed', '#0891b2', '#db2777', '#4b5563'
-    ];
-
-    // ================= BAR CHART =================
-    new Chart(document.getElementById('kelasKataBarChart'), {
-        type: 'bar',
-        data: {
-            labels: kelasLabels,
-            datasets: [{
-                label: 'Jumlah Istilah',
-                data: kelasTotals,
-                backgroundColor: colors,
-                borderRadius: 8,
-                barThickness: 38
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // ================= DOUGHNUT =================
-    new Chart(document.getElementById('kelasKataDonutChart'), {
-        type: 'doughnut',
-        data: {
-            labels: kelasLabels,
-            datasets: [{
-                data: kelasTotals,
-                backgroundColor: colors,
-                borderWidth: 0
-            }]
-        },
-        options: {
-            cutout: '65%',
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-</script>
-
-
 @endsection

@@ -218,7 +218,7 @@
                 Fitur <span class="font-semibold text-blue-400">Koreksi Kata</span> memudahkan pengguna untuk membantu memperbaiki
                 data dalam <span class="font-semibold text-blue-400">Kamus Balai Bahasa Riau</span>.
                 Bersama <span class="font-semibold text-blue-400">Balai Bahasa Provinsi Riau</span>
-                <span class="font-semibold text-blue-400"></span>kami menjaga keakuratan bahasa daerah secara kolaboratif.
+                <span class="font-semibold text-blue-400"></span>kami menjaga keakuratan bahasa Melayu Riau secara kolaboratif.
             </p>
         </div>
 
@@ -482,7 +482,7 @@
                     </div>
 
                     <div>
-                        <label class="font-semibold block">Email (Opsional)</label>
+                        <label class="font-semibold block">Pos-el (Opsional)</label>
                         <input type="email" id="email_pengoreksi" name="email_pengoreksi" placeholder="Contoh : balaibahasariau@gmail.com"
                             class="w-full h-[48px] px-4 rounded-md
                                border border-gray-200 bg-gray-50">

@@ -3,15 +3,58 @@
         z-index: 20000 !important;
         /* pastikan di atas semua elemen dashboard */
     }
+
+    /* Paksa tinggi area brand agar stabil */
+    .app-brand {
+        min-height: 72px;
+        /* jarak aman dari menu */
+        display: flex;
+        align-items: center;
+    }
+
+    /* Rapikan link brand */
+    .app-brand-link {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Tinggi area brand dikunci */
+    .sidebar-brand-center {
+        height: 80px;
+        /* stabil, tidak terlalu tinggi */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Link brand dipaksa full & center */
+    .sidebar-brand-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* Logo */
+    .sidebar-logo-img {
+        height: 40px;
+        width: auto;
+        display: block;
+        margin: 0;
+        margin-right: 40px;
+        transform: translateY(-4px);
+        /* ⬅️ INI YANG BIKIN PAS TENGAH */
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+    }
 </style>
 
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
         <!-- Menu -->
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-            <div class="app-brand demo">
-                <a href="index.html" class="app-brand-link">
-                    <span class="app-brand-logo demo">
+            <div class="app-brand demo sidebar-brand-center">
+                <a href="index.html" class="app-brand-link sidebar-brand-link">
+                    <span class="app-brand-logo demo d-flex align-items-center">
                         <svg
                             width="25"
                             viewBox="0 0 25 42"
@@ -48,10 +91,11 @@
                         </svg>
                     </span>
                     <span class="app-brand-text demo menu-text fw-bolder ms-2">
-                        <img src="{{ asset('assets/BBP.png') }}" alt="Logo"
-                            style="height: 100px; width: auto; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));">
+                        <img
+                            src="{{ asset('assets/logobbpr4.png') }}"
+                            alt="Logo"
+                            class="sidebar-logo-img">
                     </span>
-
                 </a>
 
                 <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -64,7 +108,7 @@
             <!-- SideBar Menu -->
 
             <li class="menu-header small text-uppercase">
-                <span class="menu-header-text">Halaman Utama</span>
+                <span class="menu-header-text mt-10">Halaman Utama</span>
             </li>
 
             <ul class="menu-inner py-1">

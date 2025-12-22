@@ -251,9 +251,9 @@
                 Ajukan Kosakata
             </h1>
             <p class="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed animate-fade-in-delay">
-                Fitur <span class="font-semibold text-blue-400">Ajukan Kosakata</span> memudahkan pengguna untuk turut memperkaya kosakata bahasa Melayu dari berbagai daerah.
-                Bersama <span class="font-semibold text-blue-400">Balai Bahasa Provinsi Riau,</span>
-                <span class="font-semibold text-blue-400"></span>kami menjaga keakuratan bahasa daerah secara kolaboratif.
+                Fitur <span class="font-semibold text-blue-400">Ajukan Kosakata</span> memudahkan pengguna untuk turut memperkaya kosakata bahasa Melayu Riau.
+                Bersama <span class="font-semibold text-blue-400">Balai Bahasa Provinsi Riau </span>
+                <span class="font-semibold text-blue-400"></span>,kami menjaga keakuratan bahasa Melayu Riau secara kolaboratif.
             </p>
         </div>
 
@@ -292,7 +292,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-indigo-700 text-lg mb-1">Langkah 2</h3>
-                            <p class="text-gray-700">Cari <b>Kata</b> Masukkan kosakata yang akan ditambahkan pada kolom “Kata”.</p>
+                            <p class="text-gray-700">Masukkan <b>kosakata</b> yang akan ditambahkan pada kolom “Kata”.</p>
                         </div>
                     </div>
                 </div>
@@ -519,7 +519,7 @@
 
                     <div>
                         <label class="font-semibold block">
-                            Email (Opsional)
+                            Pos-el (Opsional)
                         </label>
                         <input type="email" id="email_pengaju" name="email_pengaju" placeholder="Contoh : balaibahasariau@gmail.com"
                             class="w-full h-[48px] px-4 rounded-md

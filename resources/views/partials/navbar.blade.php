@@ -108,13 +108,13 @@
     class="px-4 md:px-16 py-1 absolute top-0 left-0 w-full z-50 bg-transparent">
 
     <!-- WRAPPER -->
-    <div class="flex items-center justify-between w-full px-4">
+    <div class="flex items-center justify-between w-full px-4 mt-10">
         <!-- LOGO (always left) -->
-        <div class="flex-shrink-0">
-            <img src="{{ asset('assets/BBP.png') }}"
+        <div class="flex-shrink-0 ">
+            <img src="{{ asset('assets/bbpr3.png') }}"
                 alt="Logo BBP"
                 class="block"
-                style="width: 140px; height: auto; object-fit: contain;">
+                style="width: 200px; height: auto; object-fit: contain;">
         </div>
 
         <!-- DESKTOP MENU (center) -->

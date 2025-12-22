@@ -13,7 +13,7 @@
         <title>Kamus Balai Bahasa Riau</title>
         @vite(['resources/css/app.css'])
         <link rel="stylesheet" href="{{ asset('build/assets/app-BL-OqM7X.css') }}">
-<script type="module" src="{{ asset('build/assets/app-Bj43h_rG.js') }}"></script>
+        <script type="module" src="{{ asset('build/assets/app-Bj43h_rG.js') }}"></script>
         <!-- di head -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="..." crossorigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
@@ -306,7 +306,7 @@
                 <div id="bookmarkList" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
 
                 <p id="bookmarkEmpty" class="hidden text-center text-gray-500 py-4">
-                    Belum ada Markah tersimpan
+                    Belum ada markah tersimpan
                 </p>
             </div>
         </div>
@@ -453,11 +453,11 @@
                         </div>
                         <div class="bg-white shadow-md hover:shadow-lg p-4 rounded-md text-center cursor-pointer">
                             <h3 class="text-blue-600 font-bold text-sm md:text-base">7.000+ Kosakata</h3>
-                            <p class="text-gray-600 text-xs md:text-sm leading-snug">Kamus Indonesia-<br>Rokan Hilir</p>
+                            <p class="text-gray-600 text-xs md:text-sm leading-snug">Kamus Indonesia-<br>Melayu Rokan Hilir</p>
                         </div>
                         <div class="bg-white shadow-md hover:shadow-lg p-4 rounded-md text-center cursor-pointer">
                             <h3 class="text-blue-600 font-bold text-sm md:text-base">7.000+ Kosakata</h3>
-                            <p class="text-gray-600 text-xs md:text-sm leading-snug">Kamus Indonesia-<br>Kuantan Singingi</p>
+                            <p class="text-gray-600 text-xs md:text-sm leading-snug">Kamus Indonesia-<br>Melayu Kuantan Singingi</p>
                         </div>
                         <div class="bg-white shadow-md hover:shadow-lg p-4 rounded-md text-center cursor-pointer">
                             <h3 class="text-blue-600 font-bold text-sm md:text-base">Ada 20.000+ Kosakata</h3>
@@ -470,7 +470,7 @@
                 <div id="welcomeCard" class="welcome-card fixed bottom-5 right-5 w-64 bg-white shadow-lg rounded-xl p-4 flex items-center gap-3 border border-dark-100 z-50">
                     <img src="{{ asset('assets/bb2.png') }}" class="w-14 h-14 object-contain drop-shadow-md">
                     <div class="flex-1">
-                        <p class="text-sm font-semibold text-blue-700 leading-tight">Selamat Datang di Kamus Digital Riau!</p>
+                        <p class="text-sm font-semibold text-blue-700 leading-tight">Selamat Datang di Kamus Elektronik Bahasa Melayu Riau</p>
                     </div>
                     <button onclick="closeWelcomeCard()" class="text-gray-400 hover:text-red-500 transition text-sm font-bold ml-1">✕</button>
                 </div>

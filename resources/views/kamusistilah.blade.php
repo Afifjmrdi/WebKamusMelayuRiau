@@ -270,7 +270,7 @@
         <div id="welcomeCard" class="welcome-card fixed bottom-5 right-5 w-64 bg-white shadow-lg rounded-xl p-4 flex items-center gap-3 border border-dark-100 z-50">
             <img src="{{ asset('assets/bb2.png') }}" class="w-14 h-14 object-contain drop-shadow-md">
             <div class="flex-1">
-                <p class="text-sm font-semibold text-blue-700 leading-tight">Selamat Datang di Kamus Istilah Melayu Riau!</p>
+                <p class="text-sm font-semibold text-blue-700 leading-tight">Selamat Datang di Kamus Elektronik Bahasa Melayu Riau!</p>
             </div>
             <button onclick="closeWelcomeCard()" class="text-gray-400 hover:text-red-500 transition text-sm font-bold ml-1">✕</button>
         </div>

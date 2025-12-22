@@ -250,10 +250,10 @@
                 Tentang Kami
             </h1>
             <p class="text-gray-600 text-lg max-w-3xl mx-auto mb-12">
-                <span class="font-semibold text-blue-400">Kamus Balai Bahasa Riau</span> merupakan hasil kolaborasi antara
+                <span class="font-semibold text-blue-400">KEMALA</span> merupakan hasil kolaborasi antara
                 <span class="font-semibold text-blue-400">Balai Bahasa Provinsi Riau</span> dan
                 <span class="font-semibold text-blue-400">Politeknik Caltex Riau</span>.
-                Kami berkomitmen menghadirkan kamus digital yang interaktif dan mudah diakses untuk menjaga kelestarian bahasa Melayu Riau.
+                Kami berkomitmen menghadirkan kamus elektronik yang interaktif dan mudah diakses untuk menjaga kelestarian bahasa Melayu Riau.
             </p>
         </div>
         {{-- Collaboration Card --}}
@@ -278,7 +278,7 @@
                     </p>
                 </div>
 
-                <img src="{{ asset('assets/BBP.png') }}" class="logo-img" alt="Balai Bahasa Riau">
+                <img src="{{ asset('assets/logobbpr4.png') }}" class="logo-img" alt="Balai Bahasa Riau" style="width: 160px; height: auto;">
             </div>
         </div>
 
