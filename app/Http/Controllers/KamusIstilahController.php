@@ -10,10 +10,13 @@ class KamusIstilahController extends Controller
 {
     public function index()
     {
-        $istilah = KamusIstilah::orderBy('entri')->get();
+        $istilah = KamusIstilah::orderBy('entri')
+            ->limit(100)
+            ->get();
 
         return view('kamusistilah', compact('istilah'));
     }
+
 
     public function search(Request $request)
     {

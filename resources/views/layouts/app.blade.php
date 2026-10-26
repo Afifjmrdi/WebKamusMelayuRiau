@@ -7,7 +7,8 @@
 
     <title>@yield('title', 'Kamus Balai Bahasa Riau')</title>
 
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
 
     {{-- Font & Icon --}}
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">

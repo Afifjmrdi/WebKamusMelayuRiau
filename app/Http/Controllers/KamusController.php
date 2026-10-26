@@ -4,28 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Kamus;
-use Illuminate\Support\Str;
 use App\Models\Kata;
-use App\Models\Visitor;
-use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\KamusImport;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use App\Imports\KamusImport;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 
 class KamusController extends Controller
 {
     public function index()
     {
-        // Kosakata hari ini
+        // Cache Kosakata hari ini (1 hari)
         $kosakataHariIni = Cache::remember('kosakata_menarik_' . date('Y-m-d'), 86400, function () {
             return \App\Models\Kata::inRandomOrder()->limit(30)->get();
         });
 
+        // Cache Trending (5 menit)
         $trending = Cache::remember('trending_kata_10', 300, function () {
             return \App\Models\Kamus::orderBy('search_count', 'desc')->limit(10)->get();
         });
@@ -44,33 +43,36 @@ class KamusController extends Controller
                 return Kamus::inRandomOrder()->limit(16)->get();
             }
         );
-
         return view('kosakatamenarik', compact('kosakataHariIni'));
     }
 
+    // ==========================================================
+    // FUNGSI PENCARIAN (UPDATED: Pagination & Highlighting)
+    // ==========================================================
     public function search(Request $request)
     {
         $q = trim((string) $request->input('q', ''));
         $filterAsal = $request->input('asal_kamus', '');
-        $mode = $request->input('mode', 'indo-ke-daerah'); // baru: mode pencarian
+        $mode = $request->input('mode', 'indo-ke-daerah');
+        $page = (int) $request->input('page', 1);
 
-        // jika kosong, return kosong (frontend tidak akan menampilkan)
+        // Jika keyword kosong, kembalikan array kosong
         if ($q === '') {
-            return response()->json([]);
+            return response()->json(['data' => [], 'next_page_url' => null]);
         }
 
-        // limit hasil agar tidak membebani
-        $limit = 100;
+        $perPage = 10; // Load 10 data per scroll
 
-        // cache key (sertakan mode agar cache tidak tercampur)
-        $cacheKey = 'search:' . md5($q . '|' . $filterAsal . '|' . $mode);
+        // Cache Key unik berdasarkan query + page
+        $cacheKey = 'search:' . md5($q . '|' . $filterAsal . '|' . $mode . '|' . $page);
 
-        $results = Cache::remember($cacheKey, 30, function () use ($q, $filterAsal, $limit, $mode) {
+        // Cache 30 menit
+        $paginator = Cache::remember($cacheKey, 1800, function () use ($q, $filterAsal, $mode, $perPage) {
             $query = Kamus::query()
                 ->select('id', 'kata', 'suku_kata', 'kelas_kata', 'arti', 'contoh', 'asal_kamus');
 
             if ($mode === 'daerah-ke-indo') {
-                // cari di kolom arti / contoh — user memasukkan kata daerah
+                // Pencarian Bahasa Daerah -> Indo (Cari di arti/contoh)
                 $query->where(function ($sub) use ($q) {
                     $sub->where('arti', 'LIKE', $q . '%')
                         ->orWhere('arti', 'LIKE', '%' . $q . '%')
@@ -81,16 +83,11 @@ class KamusController extends Controller
                     $query->where('asal_kamus', $filterAsal);
                 }
 
-                // ordering: prefer where arti startswith q
-                $query->orderByRaw("
-                CASE
-                    WHEN arti LIKE ? THEN 0
-                    WHEN arti LIKE ? THEN 1
-                    ELSE 2
-                END", [$q . '%', '%' . $q . '%'])
+                // Prioritaskan yang awalannya sama
+                $query->orderByRaw("CASE WHEN arti LIKE ? THEN 0 WHEN arti LIKE ? THEN 1 ELSE 2 END", [$q . '%', '%' . $q . '%'])
                     ->orderBy('kata');
             } else {
-                // default: indo -> daerah (sekarang behavior lama)
+                // Default: Indo -> Daerah
                 $query->where(function ($sub) use ($q) {
                     $sub->where('kata', 'LIKE', $q . '%')
                         ->orWhere('kata', 'LIKE', '%' . $q . '%')
@@ -102,98 +99,54 @@ class KamusController extends Controller
                     $query->where('asal_kamus', $filterAsal);
                 }
 
-                $query->orderByRaw("
-                CASE
-                    WHEN kata LIKE ? THEN 0
-                    WHEN kata LIKE ? THEN 1
-                    ELSE 2
-                END", [$q . '%', '%' . $q . '%'])
+                $query->orderByRaw("CASE WHEN kata LIKE ? THEN 0 WHEN kata LIKE ? THEN 1 ELSE 2 END", [$q . '%', '%' . $q . '%'])
                     ->orderBy('kata');
             }
 
-            return $query->limit($limit)->get();
+            return $query->paginate($perPage);
         });
 
-        // highlight hasil (safe-ish, kita return HTML snippets; frontend akan gunakan innerHTML)
+        // Proses Highlight Hasil (Tanpa merusak objek paginator asli)
         $escaped = preg_quote($q, '/');
 
-        $results = $results->map(function ($item) use ($escaped, $q, $mode) {
+        $paginator->getCollection()->transform(function ($item) use ($escaped, $q, $mode) {
             $kata = $item->kata ?? '';
             $arti = is_string($item->arti) ? $item->arti : (string) $item->arti;
             $contoh = $item->contoh ?? '';
 
             if ($mode === 'daerah-ke-indo') {
-                // display: user searched a *term in arti* (bahasa daerah)
-                // For frontend compatibility, we set:
-                // - kata => the searched term (so it shows as the left column)
-                // - kata_highlight => highlighted searched term
-                // - arti => the Indonesian lemma (item->kata)
-                // - arti_highlight => Indonesian lemma (no highlight or could highlight matching portion)
-                $kata_display = $q;
-                $kata_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e($kata_display));
-                $arti_highlight = e(Str::limit($kata, 150)); // item->kata used as 'arti' now
-                $contoh_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($contoh, 120)));
-
                 return [
                     'id' => $item->id,
-                    // tampilkan kata yang dicari di sisi kiri (bahasa daerah)
-                    'kata' => $kata_display,
-                    'kata_highlight' => $kata_highlight,
+                    'kata' => $item->kata,
+                    'kata_highlight' => preg_replace("/($escaped)/i", '<mark>$1</mark>', e($item->kata)),
                     'suku_kata' => $item->suku_kata,
-                    // kelas_kata tetap dari item (tipe kata)
                     'kelas_kata' => $item->kelas_kata,
-                    // arti => tunjukkan lemma Indonesianya
-                    'arti' => $kata,
-                    'arti_highlight' => $arti_highlight,
-                    'contoh' => $item->contoh,
-                    'contoh_highlight' => $contoh_highlight,
+                    'arti' => $arti,
+                    'arti_highlight' => preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($arti, 150))),
+                    'contoh' => $contoh,
+                    'contoh_highlight' => preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($contoh, 120))),
                     'asal_kamus' => $item->asal_kamus,
-                    // tambahan: original_kata untuk keperluan debugging/display lain
-                    'original_kata' => $item->kata,
                 ];
             }
 
-            // default (indo -> daerah) : behavior lama
-            $kata_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e($kata));
-            $arti_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($arti, 150)));
-            $contoh_highlight = preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($contoh, 120)));
-
+            // Default Highlight
             return [
                 'id' => $item->id,
                 'kata' => $kata,
-                'kata_highlight' => $kata_highlight,
+                'kata_highlight' => preg_replace("/($escaped)/i", '<mark>$1</mark>', e($kata)),
                 'suku_kata' => $item->suku_kata,
                 'kelas_kata' => $item->kelas_kata,
                 'arti' => $arti,
-                'arti_highlight' => $arti_highlight,
+                'arti_highlight' => preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($arti, 150))),
                 'contoh' => $contoh,
-                'contoh_highlight' => $contoh_highlight,
+                'contoh_highlight' => preg_replace("/($escaped)/i", '<mark>$1</mark>', e(Str::limit($contoh, 120))),
                 'asal_kamus' => $item->asal_kamus,
             ];
         });
 
-        return response()->json($results);
+        return response()->json($paginator);
     }
 
-
-    // public function trackSearch(Request $request)
-    // {
-    //     $id = (int) $request->input('id', 0);
-    //     if ($id <= 0) {
-    //         return response()->json(['success' => false, 'message' => 'Invalid id'], 400);
-    //     }
-
-    //     try {
-    //         // race-safe increment
-    //         Kamus::where('id', $id)->increment('search_count');
-    //         return response()->json(['success' => true]);
-    //     } catch (\Exception $e) {
-    //         Log::error('trackSearch error: ' . $e->getMessage());
-    //         return response()->json(['success' => false], 500);
-    //     }
-    // }
-
-    /** (optional) return JSON detail untuk id tertentu */
     public function detailJson($id)
     {
         $item = Kamus::select('id', 'kata', 'suku_kata', 'kelas_kata', 'arti', 'contoh', 'asal_kamus')->find($id);
@@ -205,14 +158,23 @@ class KamusController extends Controller
         return response()->json($item);
     }
 
+    // ==========================================================
+    // FITUR ADMIN (CRUD & EXCEL)
+    // ==========================================================
+
     public function adminDashboard()
     {
         if (!session('admin_id')) {
             return redirect()->route('admin.login');
         }
 
-        // ✅ daftar kamus dinamis dari database
         $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
+
+        // Count dummy jika variabel belum ada di view, sesuaikan dengan logic count anda
+        $kuansingCount = Kamus::where('asal_kamus', 'like', '%Kuantan%')->count();
+        $siakCount = Kamus::where('asal_kamus', 'like', '%Siak%')->count();
+        $rohilCount = Kamus::where('asal_kamus', 'like', '%Rokan%')->count();
+        $inhilCount = Kamus::where('asal_kamus', 'like', '%Indragiri%')->count();
 
         return view('admin.dashboard', compact(
             'kuansingCount',
@@ -221,48 +183,6 @@ class KamusController extends Controller
             'inhilCount',
             'asalKamusList'
         ));
-    }
-
-    public function edit($id)
-    {
-        if (!session('admin_id')) {
-            return redirect()->route('admin.login');
-        }
-
-        $kamus = Kamus::findOrFail($id);
-        $asalKamusList = [
-            'Kamus Indonesia - Kuantan Singingi',
-            'Kamus Indonesia - Melayu Siak',
-            'Kamus Indonesia - Rokan Hilir',
-            'Kamus Indonesia - Indragiri Hulu'
-        ];
-
-        return view('admin.edit', compact('kamus', 'asalKamusList'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'kata' => 'required|string|max:255',
-            'kelas_kata' => 'required|string|max:255',
-            'arti' => 'required|string',
-            'contoh' => 'nullable|string',
-            'asal_kamus' => 'required|string',
-            'suku_kata' => 'nullable|string',
-        ]);
-
-        $kamus = Kamus::findOrFail($id);
-        $kamus->update($request->all());
-
-        return redirect()->route('admin.kamus')->with('success', 'Data kamus berhasil diperbarui!');
-    }
-
-    public function destroy($id)
-    {
-        $kamus = Kamus::findOrFail($id);
-        $kamus->delete();
-
-        return redirect()->route('admin.kamus')->with('success', 'Data kamus berhasil dihapus!');
     }
 
     public function adminKamus(Request $request)
@@ -303,26 +223,20 @@ class KamusController extends Controller
             ->withQueryString();
 
         $daftarAsalKamus = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
-        $kelasKataList   = Kamus::select('kelas_kata')->distinct()->pluck('kelas_kata');
-
-        // ✅ tambahan ini
-        $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
+        $asalKamusList = $daftarAsalKamus; // Alias
 
         $kelasKataList = [
-            'n',        // Nomina (Kata Benda)
-            'v',        // Verba (Kata Kerja)
-            'adj',      // Adjektiva (Kata Sifat)
-            'adv',      // Adverbia (Kata Keterangan)
-            'pron',     // Pronomina (Kata Ganti)
-            'num',      // Numeralia (Kata Bilangan)
-            'prep',     // Preposisi (Kata Depan)
-            'konj',     // Konjungsi (Kata Penghubung)
-            'interj',   // Interjeksi (Kata Seru)
-            'part',     // Partikel
+            'n',
+            'v',
+            'adj',
+            'adv',
+            'pron',
+            'num',
+            'prep',
+            'konj',
+            'interj',
+            'part'
         ];
-
-        $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
-
 
         return view('admin.kamus', compact(
             'dataKamus',
@@ -337,9 +251,7 @@ class KamusController extends Controller
         if (!session('admin_id')) {
             return redirect()->route('admin.login');
         }
-
         $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
-
         return view('admin.create', compact('asalKamusList'));
     }
 
@@ -363,19 +275,40 @@ class KamusController extends Controller
         ]);
     }
 
-    public function import(Request $request)
+    public function edit($id)
+    {
+        if (!session('admin_id')) {
+            return redirect()->route('admin.login');
+        }
+
+        $kamus = Kamus::findOrFail($id);
+        $asalKamusList = Kamus::select('asal_kamus')->distinct()->pluck('asal_kamus');
+
+        return view('admin.edit', compact('kamus', 'asalKamusList'));
+    }
+
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
+            'kata' => 'required|string|max:255',
+            'kelas_kata' => 'required|string|max:255',
+            'arti' => 'required|string',
+            'contoh' => 'nullable|string',
+            'asal_kamus' => 'required|string',
+            'suku_kata' => 'nullable|string',
         ]);
 
-        try {
-            Excel::import(new KamusImport, $request->file('file'));
+        $kamus = Kamus::findOrFail($id);
+        $kamus->update($request->all());
 
-            return back()->with('success', 'Data kosakata berhasil diimport!');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
-        }
+        return redirect()->route('admin.kamus')->with('success', 'Data kamus berhasil diperbarui!');
+    }
+
+    public function destroy($id)
+    {
+        $kamus = Kamus::findOrFail($id);
+        $kamus->delete();
+        return redirect()->route('admin.kamus')->with('success', 'Data kamus berhasil dihapus!');
     }
 
     public function bulkDestroy(Request $request)
@@ -392,7 +325,6 @@ class KamusController extends Controller
 
         try {
             Kamus::whereIn('id', $ids)->delete();
-
             return response()->json([
                 'success' => true,
                 'message' => count($ids) . ' data kosakata berhasil dihapus.'
@@ -405,62 +337,18 @@ class KamusController extends Controller
         }
     }
 
-    public function downloadTemplateImport()
+    public function import(Request $request)
     {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Template Import Kamus');
-
-        // Header
-        $headers = [
-            'kata',
-            'kelas_kata',
-            'arti',
-            'contoh',
-            'asal_kamus',
-            'suku_kata'
-        ];
-
-        $sheet->fromArray($headers, null, 'A1');
-
-        // Styling header (Excel green)
-        $sheet->getStyle('A1:F1')->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'color' => ['rgb' => 'FFFFFF']
-            ],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '217346'] // Excel Green
-            ],
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
         ]);
 
-        // Auto width
-        foreach (range('A', 'F') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
+        try {
+            Excel::import(new KamusImport, $request->file('file'));
+            return back()->with('success', 'Data kosakata berhasil diimport!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
         }
-
-        // Contoh data
-        $sheet->fromArray([
-            'mengelala',
-            'v',
-            'mencari sesuatu setengah mati karena lupa menyimpan barang',
-            'Ia mengelala dompetnya sejak pagi',
-            'Kamus Indonesia - Melayu Siak',
-            'me.nge.la.la'
-        ], null, 'A2');
-
-        // Freeze header
-        $sheet->freezePane('A2');
-
-        $writer = new Xlsx($spreadsheet);
-
-        return new StreamedResponse(function () use ($writer) {
-            $writer->save('php://output');
-        }, 200, [
-            "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "Content-Disposition" => "attachment; filename=template_import_kamus.xlsx",
-        ]);
     }
 
     public function previewImport(Request $request)
@@ -470,17 +358,51 @@ class KamusController extends Controller
         ]);
 
         $file = $request->file('file');
-
-        // Ambil data mentah Excel
         $rows = Excel::toArray(new KamusImport, $file)[0];
-
-        // Jalankan validasi tanpa simpan
         $import = new KamusImport;
         Excel::import($import, $file);
 
         return view('admin.datakamus.import-preview', [
             'rows'     => $rows,
             'failures' => $import->failures()
+        ]);
+    }
+
+    public function downloadTemplateImport()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Import Kamus');
+
+        $headers = ['kata', 'kelas_kata', 'arti', 'contoh', 'asal_kamus', 'suku_kata'];
+        $sheet->fromArray($headers, null, 'A1');
+
+        $sheet->getStyle('A1:F1')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '217346']],
+        ]);
+
+        foreach (range('A', 'F') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $sheet->fromArray([
+            'mengelala',
+            'v',
+            'mencari sesuatu...',
+            'Ia mengelala...',
+            'Kamus Indonesia - Melayu Siak',
+            'me.nge.la.la'
+        ], null, 'A2');
+
+        $sheet->freezePane('A2');
+        $writer = new Xlsx($spreadsheet);
+
+        return new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output');
+        }, 200, [
+            "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Content-Disposition" => "attachment; filename=template_import_kamus.xlsx",
         ]);
     }
 }

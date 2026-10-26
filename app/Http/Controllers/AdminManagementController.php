@@ -3,86 +3,131 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use App\Models\Admin;
 use App\Models\PendingAdmin;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\AdminApprovalMail;
+use App\Services\GmailService;
 
 class AdminManagementController extends Controller
 {
+    /**
+     * SIMPAN ADMIN BARU (PENDING)
+     */
     public function store(Request $request)
     {
-        // Validasi input + cek ke dua tabel sekaligus
         $request->validate([
-            'name' => 'required|string|max:255',
-
-            // username unique di 2 tabel
-            'username' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:admins,username',
-                'unique:pending_admins,username',
-            ],
-
-            // email unique di 2 tabel
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                'unique:admins,email',
-                'unique:pending_admins,email',
-            ],
-
-            'password' => 'required|min:6'
-        ], [
-            'username.unique' => 'Username sudah digunakan, silakan pilih yang lain.',
-            'email.unique' => 'Email sudah terdaftar, gunakan email lain ya.',
+            'name'     => 'required|string|max:100',
+            'username' => 'required|string|max:50|unique:admins,username',
+            'email'    => 'required|email|unique:admins,email',
+            'password' => 'required|min:8',
         ]);
 
+        $token = Str::random(60);
 
-        // Simpan ke pending_admins
         $pending = PendingAdmin::create([
-            'name' => $request->name,
+            'name'     => $request->name,
             'username' => $request->username,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'token' => bin2hex(random_bytes(32)),
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'token'    => $token,
         ]);
 
-        // Ambil superadmin
-        $superadmin = Admin::where('is_superadmin', 1)->first();
+        // kirim email ke superadmin
+        $superadminEmail = Admin::where('is_superadmin', 1)->value('email');
 
-        if (!$superadmin) {
-            return back()->with('error', 'Superadmin tidak ditemukan!');
+        if ($superadminEmail) {
+            $approveUrl = route('admin.approve', $token);
+
+            app(GmailService::class)->send(
+                $superadminEmail,
+                'Persetujuan Admin Baru',
+                view('emails.approval_admin', [
+                    'name'       => $pending->name,
+                    'approveUrl' => $approveUrl,
+                ])->render()
+            );
         }
 
-        // Kirim email approval
-        Mail::to($superadmin->email)->send(new AdminApprovalMail($pending));
-
-        return back()->with('success', 'Admin baru berhasil ditambahkan. Silakan lakukan persetujuan melalui email superadmin.');
+        return back()->with('success', 'Admin berhasil didaftarkan dan menunggu persetujuan superadmin.');
     }
 
-    public function approveAdmin($token)
+    /**
+     * HALAMAN APPROVAL (SUPERADMIN)
+     */
+    public function approvePage($token)
     {
         $pending = PendingAdmin::where('token', $token)->first();
 
         if (!$pending) {
-            return redirect()->route('admin.dashboard')
-                ->with('error', 'Token tidak valid.');
+            return redirect()->route('admin.login')
+                ->with('error', 'Token persetujuan tidak valid atau sudah digunakan.');
         }
 
+        return view('approval_admin', compact('pending'));
+    }
+
+    /**
+     * SETUJUI ADMIN
+     */
+    public function approveProcess($token)
+    {
+        $pending = PendingAdmin::where('token', $token)->first();
+
+        if (!$pending) {
+            return redirect()->route('admin.login')
+                ->with('error', 'Token persetujuan tidak valid.');
+        }
+
+        // pindahkan ke tabel admins
         Admin::create([
-            'name' => $pending->name,
-            'username' => $pending->username,
-            'email' => $pending->email,
-            'password' => $pending->password,
-            'is_superadmin' => false,
+            'name'          => $pending->name,
+            'username'      => $pending->username,
+            'email'         => $pending->email,
+            'password'      => $pending->password,
+            'is_superadmin' => 0,
         ]);
+
+        // kirim email ke pengaju (DITERIMA)
+        app(GmailService::class)->send(
+            $pending->email,
+            'Akun Admin Anda Disetujui',
+            view('emails.admin_approved', [
+                'name'     => $pending->name,
+                'loginUrl' => route('admin.login'),
+            ])->render()
+        );
 
         $pending->delete();
 
-        return redirect()->route('admin.dashboard')
-            ->with('success', 'Admin berhasil disetujui dan telah aktif.');
+        return redirect()->route('admin.login')
+            ->with('success', 'Admin berhasil disetujui dan email notifikasi terkirim.');
+    }
+
+    /**
+     * TOLAK ADMIN
+     */
+    public function rejectProcess($token)
+    {
+        $pending = PendingAdmin::where('token', $token)->first();
+
+        if (!$pending) {
+            return redirect()->route('admin.login')
+                ->with('error', 'Token penolakan tidak valid.');
+        }
+
+        // kirim email ke pengaju (DITOLAK)
+        app(GmailService::class)->send(
+            $pending->email,
+            'Permohonan Admin Ditolak',
+            view('emails.admin_rejected', [
+                'name' => $pending->name,
+            ])->render()
+        );
+
+        $pending->delete();
+
+        return redirect()->route('admin.login')
+            ->with('success', 'Permohonan admin telah ditolak dan email notifikasi terkirim.');
     }
 }
